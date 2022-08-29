@@ -27,12 +27,15 @@ class LensGui():
         # %%% Create sliders for control of both lenses
         self.flabel = QLabel('Focal Length = ' + "{:.2f}".format(f))
         self.flabel.setMinimumWidth(80)
+        self.fwobble = QCheckBox('Wobble Lens Current')
 
         hbox = QHBoxLayout()
         hbox_labels = QHBoxLayout()
         hbox_labels.addWidget(self.flabel)
         hbox.addSpacing(10)
         hbox.addWidget(self.fslider)
+        hbox.addSpacing(5)
+        hbox.addWidget(self.fwobble)
 
         vbox = QVBoxLayout()
         vbox.addLayout(hbox_labels)
@@ -313,7 +316,7 @@ class BiprismGui():
         self.box.setLayout(vbox)
         
 class ModelGui():
-    def __init__(self, num_rays, beam_type, beam_semi_angle):
+    def __init__(self, num_rays, beam_type, beam_semi_angle, beam_tilt_x, beam_tilt_y):
         
         self.box = QGroupBox('Model Settings')
         self.rayslider = QSlider(QtCore.Qt.Orientation.Horizontal)
@@ -408,6 +411,37 @@ class ModelGui():
             self.checkBoxParalell.setChecked(True)
         elif beam_type == 'point':
             self.checkBoxPoint.setChecked(True)
+            
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        self.anglelabel = QLabel('Beam Tilt Offset')
+        hbox_labels.addWidget(self.anglelabel)
+        
+        self.xanglelabel = QLabel('Beam Tilt X (Radians) = ' + "{:.3f}".format(beam_tilt_x))
+        self.xangleslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.xangleslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.xangleslider.setMinimum(-200)
+        self.xangleslider.setMaximum(200)
+        self.xangleslider.setValue(0)
+        self.xangleslider.setTickPosition(QSlider.TicksBelow)
+
+        self.yanglelabel = QLabel('Beam Tilt Y (Radians) = ' + "{:.3f}".format(beam_tilt_y))
+        self.yangleslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.yangleslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.yangleslider.setMinimum(-200)
+        self.yangleslider.setMaximum(200)
+        self.yangleslider.setValue(0)
+        self.yangleslider.setTickPosition(QSlider.TicksBelow)
+        
+
+        hbox.addWidget(self.xangleslider)
+        hbox.addWidget(self.xanglelabel)
+        
+        hbox.addWidget(self.yangleslider)
+        hbox.addWidget(self.yanglelabel)
+        
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
         
         self.view_label = QLabel('Set Camera View')
         self.init_button = QPushButton('Initial View')

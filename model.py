@@ -13,19 +13,23 @@ from gui import ModelGui
 
 class buildmodel():
     
-    def __init__(self, components, gui = 'pyqt', beam_z = 1, num_rays = 256, beam_type = 'point', beam_semi_angle = np.pi/4):
+    def __init__(self, components, beam_z = 1, num_rays = 256, beam_type = 'point', beam_semi_angle = np.pi/4, beam_tilt_x = 0, beam_tilt_y = 0):
         self.components = components
         self.num_rays = num_rays
         self.beam_width = 0.2
         self.beam_z = beam_z
         self.beam_type = beam_type
         self.beam_semi_angle = beam_semi_angle
+
+        self.beam_tilt_x = beam_tilt_x
+        self.beam_tilt_y = beam_tilt_y
+
         self.set_z_positions()
         self.z_distances = np.diff(self.z_positions)
         self.generate_rays()
         self.update_component_matrix()
         self.allowed_ray_idcs = np.arange(self.num_rays)
-        
+    
         self.detector_size = 0.5
         self.detector_pixels = 128
     
@@ -48,7 +52,7 @@ class buildmodel():
         self.z_positions.append(0)
         
     def create_gui(self):
-        self.gui = ModelGui(self.num_rays, self.beam_type, self.beam_semi_angle)
+        self.gui = ModelGui(self.num_rays, self.beam_type, self.beam_semi_angle, self.beam_tilt_x, self.beam_tilt_y)
         
     def generate_rays(self):
         self.steps = len(self.z_positions)
@@ -61,6 +65,9 @@ class buildmodel():
             self.r, self.spot_indices = point_beam(self.r, self.beam_semi_angle)
         elif self.beam_type == 'axial':
             self.r = axial_point_beam(self.r, self.beam_semi_angle)
+        
+        self.r[:, 1, :]+=self.beam_tilt_x
+        self.r[:, 3, :]+=self.beam_tilt_y
 
     def update_component_matrix(self):
         self.components_matrix = []
@@ -125,6 +132,9 @@ class buildmodel():
         self.beam_width = self.gui.beamwidthslider.value()*1e-3
         self.allowed_ray_idcs = np.arange(self.num_rays)
         
+        self.beam_tilt_x = self.gui.xangleslider.value()*np.pi*1e-3
+        self.beam_tilt_y = self.gui.yangleslider.value()*np.pi*1e-3
+
         if self.gui.checkBoxAxial.isChecked():
             self.beam_type = 'axial'
         if self.gui.checkBoxParalell.isChecked():
@@ -142,6 +152,13 @@ class buildmodel():
             str(round(self.beam_semi_angle, 2)))
         self.gui.beamwidthlabel.setText(
             str(round(self.beam_width, 2)))
+
+        self.gui.xanglelabel.setText(
+            str('Beam Tilt X (Radians) = ' + "{:.3f}".format(self.beam_tilt_x))
+        )
+        self.gui.yanglelabel.setText(
+            str('Beam Tilt Y (Radians) = ' + "{:.3f}".format(self.beam_tilt_y))
+        )
 
     def step(self):        
         self.update_component_matrix()

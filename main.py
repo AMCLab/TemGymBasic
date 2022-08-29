@@ -142,19 +142,21 @@ class LinearTEMCtrl:
     def timerstart(self, btn, component):
         # checking if state is checked
         if btn.isChecked() == True:
-    
-            # if first check box is selected
-            if btn == component.gui.xbuttonwobble:
+            if component.type == 'Double Deflector':
+                # if first check box is selected
+                if btn == component.gui.xbuttonwobble:
+                    self.timer.start()
+                    # making other check box to uncheck
+                    component.gui.ybuttonwobble.setChecked(False)
+                    
+                # if second check box is selected
+                elif btn == component.gui.ybuttonwobble:
+                    self.timer.start()
+                    # making other check box to uncheck
+                    component.gui.xbuttonwobble.setChecked(False)
+
+            elif component.type == 'Lens':
                 self.timer.start()
-                # making other check box to uncheck
-                component.gui.ybuttonwobble.setChecked(False)
-                
-            # if second check box is selected
-            elif btn == component.gui.ybuttonwobble:
-                self.timer.start()
-                # making other check box to uncheck
-                component.gui.xbuttonwobble.setChecked(False)
-                
         else:
             self.timer.stop()
 
@@ -169,10 +171,13 @@ class LinearTEMCtrl:
         self._model.gui.init_button.clicked.connect(partial(self.set_camera_params, self._model.gui.init_button))
         self._model.gui.x_button.clicked.connect(partial(self.set_camera_params, self._model.gui.x_button))
         self._model.gui.y_button.clicked.connect(partial(self.set_camera_params, self._model.gui.y_button))
+        self._model.gui.xangleslider.valueChanged.connect(self._update)
+        self._model.gui.yangleslider.valueChanged.connect(self._update)
         
         for component in self._model.components:
             if component.type == 'Lens':
                 component.gui.fslider.valueChanged.connect(self._update)
+                component.gui.fwobble.toggled.connect(partial(self.timerstart, component.gui.fwobble, component))
             elif component.type == 'Deflector':
                 component.gui.defxslider.valueChanged.connect(self._update)
                 component.gui.defyslider.valueChanged.connect(self._update)

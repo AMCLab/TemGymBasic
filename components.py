@@ -19,7 +19,7 @@ class Lens():
         self.num_points = num_points
         
         self.f = f
-        
+        self.ftime = 0
         self.blocked_ray_idcs = []
         
         self.name = name
@@ -59,6 +59,11 @@ class Lens():
         
     def update_gui(self):
         self.f = self.gui.fslider.value()*1e-3
+
+        if self.gui.fwobble.isChecked():
+            self.f = np.abs(np.sin(-1*2*np.pi*0.5e-2*self.ftime))*-0.05-0.01
+            self.ftime += 1
+
         self.set_flabel()
         self.set_matrix()
 
