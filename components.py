@@ -5,7 +5,7 @@ Created on Fri Aug  5 17:12:15 2022
 @author: DAVY
 """
 import geometry as geom
-from gui import LensGui, DeflectorGui, DoubleDeflectorGui, BiprismGui, ApertureGui
+from gui import LensGui, DeflectorGui, DoubleDeflectorGui, BiprismGui, ApertureGui, AstigmaticLensGui
 import pyqtgraph.opengl as gl
 import numpy as np
 
@@ -23,12 +23,9 @@ class Lens():
         self.blocked_ray_idcs = []
         
         self.name = name
-        
+        self.set_matrix()
         self.set_gl_geom()
         self.set_gl_label()
-        self.create_gui()
-        self.update_gui()
-        self.set_matrix()
         
     def lens_matrix(self, f):
         
@@ -64,7 +61,133 @@ class Lens():
         self.f = self.gui.fslider.value()*1e-3
         self.set_flabel()
         self.set_matrix()
+
+class AstigmaticLens():
+    def __init__(self, z, name = '', fx = -0.5, fy = -0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
+        self.type = 'Astigmatic Lens'
         
+        self.z = z
+        self.radius = radius 
+        self.label_radius = label_radius
+        self.num_points = num_points
+        
+        self.fx = fx
+        self.fy = fy
+
+        self.blocked_ray_idcs = []
+        
+        self.name = name
+        
+        self.set_gl_geom()
+        self.set_gl_label()
+        self.set_matrix()
+        
+    def lens_matrix(self, fx, fy):
+        
+        matrix = np.array([[1, 0,      0, 0, 0],
+                           [-1 / fx, 1,      0, 0, 0],
+                           [0, 0,      1, 0, 0],
+                           [0, 0, -1 / fy, 1, 0],
+                           [0, 0,       0, 0, 1]])
+
+        return matrix
+    
+    def set_matrix(self):
+        self.matrix = self.lens_matrix(self.fx, self.fy)
+    
+    def set_gl_geom(self):
+        self.gl_points = []
+        self.points = geom.lens(self.radius, self.z, self.num_points)
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points.T, color="white", width=5))
+    
+    def set_gl_label(self):
+        self.label = gl.GLTextItem(pos=np.array(
+            [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
+    
+    def set_flabel(self):
+        self.gui.fxlabel.setText(
+            'Focal Length X = ' + "{:.2f}".format(self.fx))
+        self.gui.fylabel.setText(
+            'Focal Length Y = ' + "{:.2f}".format(self.fy))
+        
+    def create_gui(self):
+        self.gui = AstigmaticLensGui(self.name + ' Interface', self.fx, self.fy)
+        
+    def update_gui(self):
+        self.fx = self.gui.fxslider.value()*1e-3
+        self.fy = self.gui.fyslider.value()*1e-3
+        self.set_flabel()
+        self.set_matrix()
+        
+class Quadrupole():
+    def __init__(self, z, name = '', fx = -0.5, fy = -0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
+        self.type = 'Quadrupole'
+        
+        self.z = z
+        self.radius = radius 
+        self.label_radius = label_radius
+        self.num_points = num_points
+        
+        self.fx = fx
+        self.fy = fy
+
+        self.blocked_ray_idcs = []
+        
+        self.name = name
+        
+        self.set_gl_geom()
+        self.set_gl_label()
+        self.set_matrix()
+        
+    def lens_matrix(self, fx, fy):
+        
+        matrix = np.array([[1, 0,      0, 0, 0],
+                           [-1 / fx, 1,      0, 0, 0],
+                           [0, 0,      1, 0, 0],
+                           [0, 0, -1 / fy, 1, 0],
+                           [0, 0,       0, 0, 1]])
+
+        return matrix
+    
+    def set_matrix(self):
+        self.matrix = self.lens_matrix(self.fx, self.fy)
+    
+    def set_gl_geom(self):
+        self.gl_points = []
+        self.points = geom.quadrupole(self.radius, np.pi/6, self.z, self.num_points)
+
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[0].T, color="b", width=5))
+        
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[1].T, color="b", width=5))
+
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[2].T, color="r", width=5))
+        
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[3].T, color="r", width=5))
+    
+    def set_gl_label(self):
+        self.label = gl.GLTextItem(pos=np.array(
+            [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
+    
+    def set_flabel(self):
+        self.gui.fxlabel.setText(
+            'Focal Length X = ' + "{:.2f}".format(self.fx))
+        self.gui.fylabel.setText(
+            'Focal Length Y = ' + "{:.2f}".format(self.fy))
+        
+    def create_gui(self):
+        self.gui = AstigmaticLensGui(self.name + ' Interface', self.fx, self.fy)
+        
+    def update_gui(self):
+        self.fx = self.gui.fxslider.value()*1e-3
+        self.fy = self.gui.fyslider.value()*1e-3
+        self.set_flabel()
+        self.set_matrix()
+
 class Deflector():
     def __init__(self, z, name = '', defx = 0.5, defy = 0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
         self.type = 'Deflector'
@@ -83,8 +206,6 @@ class Deflector():
         
         self.set_gl_geom()
         self.set_gl_label()
-        self.create_gui()
-        self.update_gui()
         self.set_matrix()
         
     def deflector_matrix(self, def_x, def_y):
@@ -153,8 +274,6 @@ class DoubleDeflector():
         
         self.set_gl_geom()
         self.set_gl_label()
-        self.create_gui()
-        self.update_gui()
         self.set_matrices()
         
         self.xtime = 0
@@ -250,8 +369,6 @@ class Biprism():
         
         self.set_gl_geom()
         self.set_gl_label()
-        self.create_gui()
-        self.update_gui()
         self.set_matrix()
         
     def biprism_matrix(self, deflection):
@@ -313,12 +430,10 @@ class Aperture():
         self.label_radius = label_radius
         self.num_points = num_points
         
-        self.create_gui()
-        self.set_gl_label()
         self.set_gl_geom()
-        self.set_gui_label()
-        
+        self.set_gl_label()
         self.set_matrix()
+        
         self.blocked_ray_idcs = []
         
     def create_gui(self):
@@ -372,6 +487,4 @@ class Aperture():
         self.update_mesh()
         
         return
-        
-        
-        
+

@@ -11,9 +11,9 @@ from functions import circular_beam, point_beam, axial_point_beam
 from gui import ModelGui
 
 
-class BuildModel():
+class buildmodel():
     
-    def __init__(self, components, beam_z = 1, num_rays = 256, beam_type = 'point', beam_semi_angle = np.pi/4):
+    def __init__(self, components, gui = 'pyqt', beam_z = 1, num_rays = 256, beam_type = 'point', beam_semi_angle = np.pi/4):
         self.components = components
         self.num_rays = num_rays
         self.beam_width = 0.2
@@ -23,8 +23,6 @@ class BuildModel():
         self.set_z_positions()
         self.z_distances = np.diff(self.z_positions)
         self.generate_rays()
-        self.create_gui()
-        self.update_gui()
         self.update_component_matrix()
         self.allowed_ray_idcs = np.arange(self.num_rays)
         
@@ -46,7 +44,6 @@ class BuildModel():
             else:
                 self.z_positions.append(component.z)
                 component.index = idx + double_deflectors
-            
             
         self.z_positions.append(0)
         
@@ -94,7 +91,7 @@ class BuildModel():
                     x_hit_biprism = np.where(x<component.radius)[0]
                     y_hit_biprism = np.where(y<component.width)[0]
                     
-                    blocked_idcs =list(set(x_hit_biprism).intersection(y_hit_biprism))
+                    blocked_idcs = list(set(x_hit_biprism).intersection(y_hit_biprism))
                     
                 component.blocked_ray_idcs = blocked_idcs
                 

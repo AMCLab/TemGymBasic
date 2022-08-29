@@ -1,32 +1,14 @@
-#!/usr/bin/env python3
-
-# Filename: pycalc.py
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-"""PyCalc is a simple calculator built using Python and PyQt5."""
-
-import sys
 from functools import partial
-
+import sys
 from functions import get_image_from_rays
 
 # Import QApplication and the required widgets from PyQt5.QtWidgets
 import PyQt5
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout
-from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QScrollArea
+from PyQt5.QtWidgets import QApplication
 
 import pyqtgraph.opengl as gl
 import pyqtgraph as pg
@@ -37,11 +19,6 @@ import numpy as np
 
 __version__ = "0.1"
 __author__ = "David Landers"
-
-ERROR_MSG = "ERROR"
-
-# Create a subclass of QMainWindow to setup the calculator's GUI
-
 
 class LinearTEMUi(QMainWindow):
     """LinearTEM's View (GUI)."""
@@ -106,6 +83,7 @@ class LinearTEMUi(QMainWindow):
         self.ray_geometry = gl.GLLinePlotItem(mode='lines', width=2)
         self.tem_window.addItem(self.ray_geometry)
         self.tem_window.addItem(self.detector_outline)
+        self.tem_window.setCameraParams(**self.initial_camera_params)
         
         for component in self._model.components:
             for geometry in component.gl_points:
@@ -135,11 +113,15 @@ class LinearTEMUi(QMainWindow):
         self.layout = QVBoxLayout(content)
         
         self.gui_dock.addWidget(scroll, 1, 0)
+        
+        self._model.create_gui()
+
         self.layout.addWidget(self._model.gui.box, 0)
         
         for idx, component in enumerate(self._model.components, start = 1):
+            component.create_gui()
             self.layout.addWidget(component.gui.box, idx)
-            
+    
 # Create a Controller class to connect the GUI and the model
 class LinearTEMCtrl:
     """LinearTEM's Controller."""
@@ -184,6 +166,9 @@ class LinearTEMCtrl:
         self._model.gui.checkBoxAxial.stateChanged.connect(self._update)
         self._model.gui.beamangleslider.valueChanged.connect(self._update)
         self._model.gui.beamwidthslider.valueChanged.connect(self._update)
+        self._model.gui.init_button.clicked.connect(partial(self.set_camera_params, self._model.gui.init_button))
+        self._model.gui.x_button.clicked.connect(partial(self.set_camera_params, self._model.gui.x_button))
+        self._model.gui.y_button.clicked.connect(partial(self.set_camera_params, self._model.gui.y_button))
         
         for component in self._model.components:
             if component.type == 'Lens':
@@ -205,7 +190,21 @@ class LinearTEMCtrl:
                 component.gui.rotslider.valueChanged.connect(self._update)
             elif component.type == 'Aperture':
                 component.gui.radiusslider.valueChanged.connect(self._update)
-
+            elif component.type == 'Astigmatic Lens':
+                component.gui.fxslider.valueChanged.connect(self._update)
+                component.gui.fyslider.valueChanged.connect(self._update)
+            elif component.type == 'Quadrupole':
+                component.gui.fxslider.valueChanged.connect(self._update)
+                component.gui.fyslider.valueChanged.connect(self._update)
+    
+    def set_camera_params(self, btn):
+        if btn == self._model.gui.x_button:
+            self._view.tem_window.setCameraParams(**self._view.x_camera_params)
+        elif btn == self._model.gui.y_button:
+            self._view.tem_window.setCameraParams(**self._view.y_camera_params)
+        elif btn == self._model.gui.init_button:
+            self._view.tem_window.setCameraParams(**self._view.initial_camera_params)
+            
     def _update(self):
         
         self._model.update_gui()
@@ -252,4 +251,11 @@ class LinearTEMCtrl:
         self._view.spot_img.setImage(detector_image.T)
 
         self._view.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
+
+def run_pyqt(model):
+    AppWindow = QApplication(sys.argv)
+    viewer = LinearTEMUi(model)
+    LinearTEMCtrl(model, viewer)
+    viewer.show()
+    sys.exit(AppWindow.exec_())
 

@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QVBoxLayout,
     QGroupBox,
-    QCheckBox
+    QCheckBox,
+    QPushButton
 )
 
 import numpy as np
@@ -34,6 +35,54 @@ class LensGui():
         hbox.addWidget(self.fslider)
 
         vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        vbox.addStretch()
+
+        self.box.setLayout(vbox)
+    
+class AstigmaticLensGui():
+    def __init__(self, name, fx, fy):
+        
+        self.box = QGroupBox(name)
+        self.fxslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.fxslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.fxslider.setMinimum(-3000)
+        self.fxslider.setMaximum(-10)
+        self.fxslider.setValue(int(round(fx*1000)))
+        self.fxslider.setTickPosition(QSlider.TicksBelow)
+        
+        # %%% Create sliders for control of both lenses
+        self.fxlabel = QLabel('Focal Length X = ' + "{:.2f}".format(fx))
+        self.fxlabel.setMinimumWidth(80)
+
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.fxlabel)
+        hbox.addSpacing(10)
+        hbox.addWidget(self.fxslider)
+
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+
+        self.fyslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.fyslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.fyslider.setMinimum(-3000)
+        self.fyslider.setMaximum(-10)
+        self.fyslider.setValue(int(round(fy*1000)))
+        self.fyslider.setTickPosition(QSlider.TicksBelow)
+        
+        # %%% Create sliders for control of both lenses
+        self.fylabel = QLabel('Focal Length Y = ' + "{:.2f}".format(fy))
+        self.fylabel.setMinimumWidth(80)
+
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.fylabel)
+        hbox.addSpacing(10)
+        hbox.addWidget(self.fyslider)
+
         vbox.addLayout(hbox_labels)
         vbox.addLayout(hbox)
         vbox.addStretch()
@@ -349,14 +398,9 @@ class ModelGui():
         self.checkBoxPoint.stateChanged.connect(partial(self.uncheck, self.checkBoxPoint))
         self.checkBoxAxial.stateChanged.connect(partial(self.uncheck, self.checkBoxAxial))
 
-        hbox_check_boxes = QHBoxLayout()
         hbox.addWidget(self.checkBoxAxial)
         hbox.addWidget(self.checkBoxPoint)
         hbox.addWidget(self.checkBoxParalell)
-        
-        vbox.addLayout(hbox_check_boxes)
-        
-        self.box.setLayout(vbox)
         
         if beam_type == 'axial':
             self.checkBoxAxial.setChecked(True)
@@ -364,8 +408,26 @@ class ModelGui():
             self.checkBoxParalell.setChecked(True)
         elif beam_type == 'point':
             self.checkBoxPoint.setChecked(True)
-            
         
+        self.view_label = QLabel('Set Camera View')
+        self.init_button = QPushButton('Initial View')
+        self.x_button = QPushButton('X View')
+        self.y_button = QPushButton('Y View')
+        
+        hbox_label = QHBoxLayout()
+        hbox_label.addWidget(self.view_label)
+        hbox_push_buttons = QHBoxLayout()
+        hbox_push_buttons.addWidget(self.init_button)
+        hbox_push_buttons.addSpacing(15)
+        hbox_push_buttons.addWidget(self.x_button)
+        hbox_push_buttons.addSpacing(15)
+        hbox_push_buttons.addWidget(self.y_button)
+        
+        vbox.addLayout(hbox_label)
+        vbox.addLayout(hbox_push_buttons)
+        
+        self.box.setLayout(vbox)
+
     # uncheck method
     def uncheck(self, btn):
 
@@ -393,6 +455,7 @@ class ModelGui():
                 self.checkBoxAxial.setChecked(False)
                 self.checkBoxParalell.setChecked(False)
                 
+    
 class ApertureGui():
     def __init__(self, name, min_radius, max_radius, inner_radius):
         
