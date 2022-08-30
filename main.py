@@ -259,6 +259,8 @@ class LinearTEMCtrl:
 
 def run_pyqt(model):
     AppWindow = QApplication(sys.argv)
+    AppWindow.setStyleSheet("QLabel{font-size: 10pt;}")
+    
     viewer = LinearTEMUi(model)
     LinearTEMCtrl(model, viewer)
     viewer.show()

@@ -29,10 +29,10 @@ class buildmodel():
         self.generate_rays()
         self.update_component_matrix()
         self.allowed_ray_idcs = np.arange(self.num_rays)
-    
+        
         self.detector_size = 0.5
         self.detector_pixels = 128
-    
+            
     def set_z_positions(self):
         self.z_positions = []
         self.z_positions.append(self.beam_z)

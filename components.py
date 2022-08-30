@@ -8,6 +8,10 @@ import geometry as geom
 from gui import LensGui, DeflectorGui, DoubleDeflectorGui, BiprismGui, ApertureGui, AstigmaticLensGui
 import pyqtgraph.opengl as gl
 import numpy as np
+from PyQt5.QtGui import QFont
+
+font = QFont()
+font.setPixelSize(20)
 
 class Lens():
     def __init__(self, z, name = '', f = 0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
@@ -49,7 +53,8 @@ class Lens():
     def set_gl_label(self):
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
-    
+        self.label.setData(font = font)
+        
     def set_flabel(self):
         self.gui.flabel.setText(
             'Focal Length = ' + "{:.2f}".format(self.f))
@@ -109,7 +114,8 @@ class AstigmaticLens():
     def set_gl_label(self):
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
-    
+        self.label.setData(font = font)
+        
     def set_flabel(self):
         self.gui.fxlabel.setText(
             'Focal Length X = ' + "{:.2f}".format(self.fx))
@@ -177,7 +183,8 @@ class Quadrupole():
     def set_gl_label(self):
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
-    
+        self.label.setData(font = font)
+        
     def set_flabel(self):
         self.gui.fxlabel.setText(
             'Focal Length X = ' + "{:.2f}".format(self.fx))
@@ -239,7 +246,8 @@ class Deflector():
     def set_gl_label(self):
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
-    
+        self.label.setData(font = font)
+        
     def set_deflabel(self):
         self.gui.defxlabel.setText(
             'X Deflection = ' + "{:.2f}".format(self.defx))
@@ -319,7 +327,8 @@ class DoubleDeflector():
     def set_gl_label(self):
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z_up]), text=self.name, color='w')
-    
+        self.label.setData(font = font)
+        
     def set_deflabel(self):
         self.gui.updefxlabel.setText(
             'X Deflection = ' + "{:.2f}".format(self.updefx))
@@ -398,7 +407,8 @@ class Biprism():
     def set_gl_label(self):
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
-    
+        self.label.setData(font = font)
+        
     def update_geometry(self):
         self.points = geom.biprism(self.radius, self.z, self.theta)
         self.gl_points[0].setData(pos = self.points.T)
@@ -468,10 +478,12 @@ class Aperture():
     def set_gl_label(self):
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
-    
+        self.label.setData(font = font)
+        
     def set_gui_label(self):
         self.gui.radiuslabel.setText(
             'Aperture Radius = ' + "{:.4f}".format(self.aperture_radius_inner))
+        
         
     def set_matrix(self):
         self.matrix = self.aperture_matrix

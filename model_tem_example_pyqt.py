@@ -24,5 +24,5 @@ components = [Lens(name = 'Electrostatic Lens', z = 3, f = -0.2),
               Lens(name = 'Projector Lens', z =0.2, f = -0.2)
               ]
 
-model = buildmodel(components, beam_z = 2.5, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.03)
+model = buildmodel(components, beam_z = 3.5, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.03)
 run_pyqt(model)
