@@ -195,12 +195,17 @@ class LinearTEMCtrl:
                 component.gui.rotslider.valueChanged.connect(self._update)
             elif component.type == 'Aperture':
                 component.gui.radiusslider.valueChanged.connect(self._update)
+                component.gui.xslider.valueChanged.connect(self._update)
+                component.gui.yslider.valueChanged.connect(self._update)
             elif component.type == 'Astigmatic Lens':
                 component.gui.fxslider.valueChanged.connect(self._update)
                 component.gui.fyslider.valueChanged.connect(self._update)
             elif component.type == 'Quadrupole':
                 component.gui.fxslider.valueChanged.connect(self._update)
                 component.gui.fyslider.valueChanged.connect(self._update)
+            elif component.type == 'Sample':
+                component.gui.xslider.valueChanged.connect(self._update)
+                component.gui.yslider.valueChanged.connect(self._update)
     
     def set_camera_params(self, btn):
         if btn == self._model.gui.x_button:

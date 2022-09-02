@@ -140,6 +140,17 @@ def axial_point_beam(r, beam_semi_angle):
     
     return r
 
+def x_axial_point_beam(r, beam_semi_angle):
+    num_rays = r.shape[2]
+    
+    x_rays = int(round(num_rays))
+    x_angles = np.linspace(-beam_semi_angle, beam_semi_angle, x_rays, endpoint = True)
+
+    for idx, angle in enumerate(x_angles):
+        r[0, 1, idx] = np.tan(angle)
+        
+    return r
+
 def get_image_from_rays(rays_x, rays_y, detector_size, detector_pixels):
 
     detector_image = np.zeros((detector_pixels, detector_pixels), dtype = np.uint8)
@@ -161,9 +172,18 @@ def get_image_from_rays(rays_x, rays_y, detector_size, detector_pixels):
         image_pixel_coords = np.delete(image_pixel_coords, np.where(
             (image_pixel_coords < 0) | (image_pixel_coords >= detector_pixels)), axis = 0)
     
-    detector_image[
-        image_pixel_coords[:, 0],
-        image_pixel_coords[:, 1],
-    ] = 1
+    # detector_image[
+    #     image_pixel_coords[:, 0],
+    #     image_pixel_coords[:, 1],
+    # ] += 1
+    
+    # convert the index array into a set of indices into detector_image.flat
+    flat_idx = np.ravel_multi_index(image_pixel_coords.T, detector_image.shape)
+    
+    # get the set of unique indices and their corresponding counts
+    uidx, ucounts = np.unique(flat_idx, return_counts=True)
+    
+    # assign the count value to each unique index in acc.flat
+    detector_image.flat[uidx] = ucounts
     
     return detector_image, image_pixel_coords

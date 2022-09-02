@@ -7,7 +7,7 @@ Created on Thu May 26 16:43:42 2022
 """
 
 import numpy as np
-from functions import circular_beam, point_beam, axial_point_beam
+from functions import circular_beam, point_beam, axial_point_beam, x_axial_point_beam
 from gui import ModelGui
 
 
@@ -65,7 +65,9 @@ class buildmodel():
             self.r, self.spot_indices = point_beam(self.r, self.beam_semi_angle)
         elif self.beam_type == 'axial':
             self.r = axial_point_beam(self.r, self.beam_semi_angle)
-        
+        elif self.beam_type == 'x_axial':
+            self.r = x_axial_point_beam(self.r, self.beam_semi_angle)
+            
         self.r[:, 1, :]+=self.beam_tilt_x
         self.r[:, 3, :]+=self.beam_tilt_y
 
@@ -84,21 +86,18 @@ class buildmodel():
         idx = 1
         for component in self.components:
             if component.type == 'Biprism':
+                x = abs(self.r[idx, 0, :])
+                y = abs(self.r[idx, 2, :])
                 if component.theta != 0:
-                    x = abs(self.r[idx, 0, :])
-                    y = abs(self.r[idx, 2, :])
+
                     x_hit_biprism = np.where(x<component.width)[0]
                     y_hit_biprism = np.where(y<component.radius)[0]
                     
-                    blocked_idcs = list(set(x_hit_biprism).intersection(y_hit_biprism))
-
                 elif component.theta == 0:
-                    x = abs(self.r[idx, 0, :])
-                    y = abs(self.r[idx, 2, :])
                     x_hit_biprism = np.where(x<component.radius)[0]
                     y_hit_biprism = np.where(y<component.width)[0]
                     
-                    blocked_idcs = list(set(x_hit_biprism).intersection(y_hit_biprism))
+                blocked_idcs = list(set(x_hit_biprism).intersection(y_hit_biprism))
                     
                 component.blocked_ray_idcs = blocked_idcs
                 
@@ -128,7 +127,7 @@ class buildmodel():
                 
     def update_gui(self):
         self.num_rays = 2**(self.gui.rayslider.value())
-        self.beam_semi_angle = self.gui.beamangleslider.value()*1e-3
+        self.beam_semi_angle = self.gui.beamangleslider.value()*1e-2
         self.beam_width = self.gui.beamwidthslider.value()*1e-3
         self.allowed_ray_idcs = np.arange(self.num_rays)
         

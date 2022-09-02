@@ -45,8 +45,8 @@ class LensGui():
         self.box.setLayout(vbox)
     
 class AstigmaticLensGui():
-    def __init__(self, name, fx, fy):
-        
+    def __init__(self, name, gui_label, fx, fy):
+            
         self.box = QGroupBox(name)
         self.fxslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.fxslider.setTickPosition(QSlider.TickPosition.TicksBelow)
@@ -56,7 +56,7 @@ class AstigmaticLensGui():
         self.fxslider.setTickPosition(QSlider.TicksBelow)
         
         # %%% Create sliders for control of both lenses
-        self.fxlabel = QLabel('Focal Length X = ' + "{:.2f}".format(fx))
+        self.fxlabel = QLabel(gui_label + 'X = ' + "{:.2f}".format(fx))
         self.fxlabel.setMinimumWidth(80)
 
         hbox = QHBoxLayout()
@@ -77,7 +77,7 @@ class AstigmaticLensGui():
         self.fyslider.setTickPosition(QSlider.TicksBelow)
         
         # %%% Create sliders for control of both lenses
-        self.fylabel = QLabel('Focal Length Y = ' + "{:.2f}".format(fy))
+        self.fylabel = QLabel(gui_label + 'Y = ' + "{:.2f}".format(fy))
         self.fylabel.setMinimumWidth(80)
 
         hbox = QHBoxLayout()
@@ -91,6 +91,55 @@ class AstigmaticLensGui():
         vbox.addStretch()
 
         self.box.setLayout(vbox)
+        
+class SampleGui():
+    def __init__(self, name, x, y):
+        
+        self.box = QGroupBox(name)
+        self.xslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.xslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.xslider.setMinimum(-100)
+        self.xslider.setMaximum(100)
+        self.xslider.setValue(int(round(x)))
+        self.xslider.setTickPosition(QSlider.TicksBelow)
+        
+        # %%% Create sliders for control of both lenses
+        self.xlabel = QLabel('X Position = ' + "{:.2f}".format(x))
+        self.xlabel.setMinimumWidth(80)
+
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.xlabel)
+        hbox.addSpacing(10)
+        hbox.addWidget(self.xslider)
+
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+
+        self.yslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.yslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.yslider.setMinimum(-100)
+        self.yslider.setMaximum(100)
+        self.yslider.setValue(int(round(y)))
+        self.yslider.setTickPosition(QSlider.TicksBelow)
+        
+        # %%% Create sliders for control of both lenses
+        self.ylabel = QLabel('y Position = ' + "{:.2f}".format(y))
+        self.ylabel.setMinimumWidth(80)
+
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.ylabel)
+        hbox.addSpacing(10)
+        hbox.addWidget(self.yslider)
+
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        vbox.addStretch()
+
+        self.box.setLayout(vbox)
+        
         
 class DeflectorGui():
     def __init__(self, name, defx, defy):
@@ -489,9 +538,8 @@ class ModelGui():
                 self.checkBoxAxial.setChecked(False)
                 self.checkBoxParalell.setChecked(False)
                 
-    
 class ApertureGui():
-    def __init__(self, name, min_radius, max_radius, inner_radius):
+    def __init__(self, name, min_radius, max_radius, inner_radius, x, y):
         
         self.box = QGroupBox(name)
         self.radiusslider = QSlider(QtCore.Qt.Orientation.Horizontal)
@@ -504,7 +552,7 @@ class ApertureGui():
         # %%% Create sliders for control of both lenses
         self.radiuslabel = QLabel('Aperture Radius = ' + "{:.2f}".format(inner_radius))
         self.radiuslabel.setMinimumWidth(80)
-        
+    
         vbox = QVBoxLayout()
         vbox.addStretch()
         
@@ -516,6 +564,47 @@ class ApertureGui():
         
         vbox.addLayout(hbox_label)
         vbox.addLayout(hbox)
+        
+        self.xslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.xslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.xslider.setMinimum(-100)
+        self.xslider.setMaximum(100)
+        self.xslider.setValue(int(round(x)))
+        self.xslider.setTickPosition(QSlider.TicksBelow)
+        
+        # %%% Create sliders for control of both lenses
+        self.xlabel = QLabel('X Position = ' + "{:.2f}".format(x))
+        self.xlabel.setMinimumWidth(80)
+
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.xlabel)
+        hbox.addSpacing(10)
+        hbox.addWidget(self.xslider)
+
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+
+        self.yslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.yslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.yslider.setMinimum(-100)
+        self.yslider.setMaximum(100)
+        self.yslider.setValue(int(round(y)))
+        self.yslider.setTickPosition(QSlider.TicksBelow)
+        
+        # %%% Create sliders for control of both lenses
+        self.ylabel = QLabel('y Position = ' + "{:.2f}".format(y))
+        self.ylabel.setMinimumWidth(80)
+
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.ylabel)
+        hbox.addSpacing(10)
+        hbox.addWidget(self.yslider)
+        
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        
         vbox.addStretch()
     
         self.box.setLayout(vbox)

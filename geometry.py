@@ -8,6 +8,22 @@ Created on Fri May 27 14:37:00 2022
 import numpy as np
 import triangle as tr
 
+def square(w, x, y, z):
+    
+    vertices = np.array([[x + w/2, y + w/2], [x - w/2, y + w/2], [x - w/2, y - w/2],
+                        [x + w/2, y - w/2], [x + w/2, y + w/2]])
+
+    sample_dict = dict(vertices=vertices)
+    
+    sample_tri = tr.triangulate(sample_dict)
+
+    zverts = np.ones((sample_tri['triangles'].shape[0], 3, 1), dtype=np.float32)*z
+    verts_2D = sample_tri['vertices'][sample_tri['triangles']]
+    verts_3D = np.dstack([verts_2D, zverts])
+    
+    return verts_3D
+
+    
 def deflector(r, phi, z, n_arc):
     
     THETA = np.linspace(-phi, phi, n_arc, endpoint = True) 
@@ -52,14 +68,14 @@ def quadrupole(r, phi, z, n_arc):
     
     return points_arc_1, points_arc_2, points_arc_3, points_arc_4
 
-def aperture(r_i, r_o, n_i, n_o, z):
+def aperture(r_i, r_o, n_i, n_o, x, y, z):
     
     i_i = np.arange(n_i)
     i_o = np.arange(n_o)
     theta_i = i_i * 2 * np.pi / n_i
     theta_o = i_o * 2 * np.pi / n_o
-    pts_inner = np.stack([np.cos(theta_i), np.sin(theta_i)], axis=1) * r_i
-    pts_outer = np.stack([np.cos(theta_o), np.sin(theta_o)], axis=1) * r_o
+    pts_inner = np.stack([x + np.cos(theta_i)*r_i, y + np.sin(theta_i)*r_i], axis=1)
+    pts_outer = np.stack([x + np.cos(theta_o)*r_o, y + np.sin(theta_o)*r_o], axis=1)
     seg_i = np.stack([i_i, i_i + 1], axis=1) % n_i
     seg_o = np.stack([i_o, i_o + 1], axis=1) % n_o
     

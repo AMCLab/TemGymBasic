@@ -5,7 +5,7 @@ Created on Fri Aug  5 17:12:15 2022
 @author: DAVY
 """
 import geometry as geom
-from gui import LensGui, DeflectorGui, DoubleDeflectorGui, BiprismGui, ApertureGui, AstigmaticLensGui
+from gui import *
 import pyqtgraph.opengl as gl
 import numpy as np
 from PyQt5.QtGui import QFont
@@ -75,7 +75,7 @@ class Lens():
 class AstigmaticLens():
     def __init__(self, z, name = '', fx = -0.5, fy = -0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
         self.type = 'Astigmatic Lens'
-        
+        self.gui_label = 'Focal Length '
         self.z = z
         self.radius = radius 
         self.label_radius = label_radius
@@ -117,13 +117,14 @@ class AstigmaticLens():
         self.label.setData(font = font)
         
     def set_flabel(self):
+
         self.gui.fxlabel.setText(
-            'Focal Length X = ' + "{:.2f}".format(self.fx))
+            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
         self.gui.fylabel.setText(
-            'Focal Length Y = ' + "{:.2f}".format(self.fy))
+            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
         
     def create_gui(self):
-        self.gui = AstigmaticLensGui(self.name + ' Interface', self.fx, self.fy)
+        self.gui = AstigmaticLensGui(self.name + ' Interface', self.gui_label, self.fx, self.fy)
         
     def update_gui(self):
         self.fx = self.gui.fxslider.value()*1e-3
@@ -131,10 +132,73 @@ class AstigmaticLens():
         self.set_flabel()
         self.set_matrix()
         
+    
+
+class Sample():
+    def __init__(self, z, name = '', label_radius = 0.3, width = 0.25, num_points = 50, x = 0, y = 0):
+        self.type = 'Sample'
+        
+        self.x = x
+        self.y = y
+        self.z = z
+        self.width = width 
+        self.label_radius = label_radius
+        self.num_points = num_points
+        
+        self.blocked_ray_idcs = []
+        self.name = name
+        self.set_matrix()
+        self.set_gl_geom()
+        self.set_gl_label()
+        
+    def sample_matrix(self):
+        
+        matrix = np.array([[1, 0, 0, 0, 0],
+                           [0, 1, 0, 0, 0],
+                           [0, 0, 1, 0, 0],
+                           [0, 0, 0, 1, 0],
+                           [0, 0, 0, 0, 1]])
+
+        return matrix
+        
+    def set_matrix(self):
+        self.matrix = self.sample_matrix()
+    
+    def set_gl_geom(self):
+        self.gl_points = []
+        self.verts = geom.square(self.width, self.x, self.y, self.z)
+        
+        self.colors = np.ones((self.verts.shape[0], 3, 4))
+        self.colors[:, :, 3] = 0.25
+        
+        self.gl_points.append(gl.GLMeshItem(vertexes=self.verts, vertexColors=self.colors,
+                                 smooth=True, drawEdges=False))
+        
+        self.gl_points[0].setGLOptions('additive')
+        
+    def create_gui(self):
+        self.gui = SampleGui(self.name + ' Interface', self.x, self.y)
+
+    def set_gl_label(self):
+        self.label = gl.GLTextItem(pos=np.array(
+            [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
+        self.label.setData(font = font)
+    
+    def update_mesh(self):
+        self.verts = geom.square(self.width, self.x, self.y, self.z)
+        
+        self.gl_points[0].setMeshData(vertexes=self.verts, vertexColors=self.colors,
+                                 smooth=True, drawEdges=False)
+        
+    def update_gui(self):
+        self.x = self.gui.xslider.value()*1e-2
+        self.y = self.gui.yslider.value()*1e-2
+        self.update_mesh()
+    
 class Quadrupole():
     def __init__(self, z, name = '', fx = -0.5, fy = -0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
         self.type = 'Quadrupole'
-        
+        self.gui_label = 'Stigmator Strength '
         self.z = z
         self.radius = radius 
         self.label_radius = label_radius
@@ -186,13 +250,14 @@ class Quadrupole():
         self.label.setData(font = font)
         
     def set_flabel(self):
+
         self.gui.fxlabel.setText(
-            'Focal Length X = ' + "{:.2f}".format(self.fx))
+            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
         self.gui.fylabel.setText(
-            'Focal Length Y = ' + "{:.2f}".format(self.fy))
+            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
         
     def create_gui(self):
-        self.gui = AstigmaticLensGui(self.name + ' Interface', self.fx, self.fy)
+        self.gui = AstigmaticLensGui(self.name + ' Interface', self.type, self.fx, self.fy)
         
     def update_gui(self):
         self.fx = self.gui.fxslider.value()*1e-3
@@ -375,7 +440,7 @@ class Biprism():
         self.radius = radius 
         self.label_radius = label_radius
         self.num_points = num_points
-        self.width = 0.001
+        self.width = width
         
         self.deflection = deflection
         self.blocked_ray_idcs = []
@@ -431,10 +496,13 @@ class Biprism():
         self.set_matrix()
         
 class Aperture():
-    def __init__(self, z, name = 'Aperture', aperture_radius_inner = 0.05, aperture_radius_outer = 0.25, label_radius = 0.3, num_points = 50):
+    def __init__(self, z, name = 'Aperture', aperture_radius_inner = 0.05, aperture_radius_outer = 0.25, label_radius = 0.3, num_points = 50, x = 0, y = 0):
         self.type = 'Aperture'
         
         self.name = name
+        
+        self.x = x
+        self.y = y
         self.z = z
 
         self.aperture_radius_inner = aperture_radius_inner
@@ -452,13 +520,13 @@ class Aperture():
         self.blocked_ray_idcs = []
         
     def create_gui(self):
-        self.gui = ApertureGui(self.name + ' Interface', self.min_radius, self.max_radius, self.aperture_radius_inner)
+        self.gui = ApertureGui(self.name + ' Interface', self.min_radius, self.max_radius, self.aperture_radius_inner, self.x, self.y)
         
     def set_gl_geom(self):
         self.gl_points = []
         
         self.verts = geom.aperture(self.aperture_radius_inner, self.aperture_radius_outer, 
-                                                       self.num_points, self.num_points, self.z)
+                                                       self.num_points, self.num_points, self.x, self.y, self.z)
         
         self.colors = np.ones((self.verts.shape[0], 3, 4))
         self.colors[:, :, 3] = 0.2
@@ -470,7 +538,7 @@ class Aperture():
         
     def update_mesh(self):
         self.verts = geom.aperture(self.aperture_radius_inner, self.aperture_radius_outer, 
-                                                       self.num_points, self.num_points, self.z)
+                                                       self.num_points, self.num_points, self.x, self.y, self.z)
         
         self.gl_points[0].setMeshData(vertexes=self.verts, vertexColors=self.colors,
                                  smooth=True, drawEdges=False)
@@ -500,6 +568,8 @@ class Aperture():
     
     def update_gui(self):
         self.aperture_radius_inner = self.gui.radiusslider.value()*1e-3
+        self.x = self.gui.xslider.value()*1e-2
+        self.y = self.gui.yslider.value()*1e-2
         self.set_gui_label()
         self.update_mesh()
         
