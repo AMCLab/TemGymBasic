@@ -107,8 +107,13 @@ class buildmodel():
                 idx += 1
                 
             elif component.type == 'Aperture':
-                radii = np.hypot(*self.r[idx, [0, 2], :])
-                component.blocked_ray_idcs = np.where(radii >= component.aperture_radius_inner)[0]
+                xp, yp = self.r[idx, 0, :], self.r[idx, 2, :]
+                xc, yc = component.x, component.y
+                distance = np.sqrt((xp-xc)**2 + (yp-yc)**2)
+                
+                
+                blocked_ray_bools = np.logical_and(distance >= component.aperture_radius_inner, distance < component.aperture_radius_outer)
+                component.blocked_ray_idcs = np.where(blocked_ray_bools)[0]
                 
                 self.r[idx+1, :, :] = np.matmul(self.propagate(self.z_distances[idx]), self.r[idx, :, :])
                 idx += 1

@@ -569,7 +569,7 @@ class ApertureGui():
         self.xslider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.xslider.setMinimum(-100)
         self.xslider.setMaximum(100)
-        self.xslider.setValue(int(round(x)))
+        self.xslider.setValue(int(round(x*1e2)))
         self.xslider.setTickPosition(QSlider.TicksBelow)
         
         # %%% Create sliders for control of both lenses
@@ -589,7 +589,7 @@ class ApertureGui():
         self.yslider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.yslider.setMinimum(-100)
         self.yslider.setMaximum(100)
-        self.yslider.setValue(int(round(y)))
+        self.yslider.setValue(int(round(y*1e2)))
         self.yslider.setTickPosition(QSlider.TicksBelow)
         
         # %%% Create sliders for control of both lenses

@@ -82,7 +82,7 @@ def aperture(r_i, r_o, n_i, n_o, x, y, z):
     pts = np.vstack([pts_outer, pts_inner])
     seg = np.vstack([seg_o, seg_i + seg_o.shape[0]])
     
-    aperture_dict = dict(vertices=pts, segments=seg, holes=[[0, 0]])
+    aperture_dict = dict(vertices=pts, segments=seg, holes=[[x, y]])
     aperture_tri = tr.triangulate(aperture_dict, 'qpa0.05')
 
     zverts = np.ones((aperture_tri['triangles'].shape[0], 3, 1), dtype=np.float32)*z

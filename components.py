@@ -496,7 +496,7 @@ class Biprism():
         self.set_matrix()
         
 class Aperture():
-    def __init__(self, z, name = 'Aperture', aperture_radius_inner = 0.05, aperture_radius_outer = 0.25, label_radius = 0.3, num_points = 50, x = 0, y = 0):
+    def __init__(self, z, name = 'Aperture', aperture_radius_inner = 0.005, aperture_radius_outer = 0.25, label_radius = 0.3, num_points = 50, x = 0, y = 0):
         self.type = 'Aperture'
         
         self.name = name
