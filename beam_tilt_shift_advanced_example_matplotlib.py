@@ -14,4 +14,4 @@ axis_view = 'x_axial'
 model = buildmodel(components, beam_z=1.5, beam_type='x_axial',
                    num_rays=32, beam_semi_angle=0.15)
 
-show_matplotlib(model)
+show_matplotlib(model, name = 'beam_tilt.svg')

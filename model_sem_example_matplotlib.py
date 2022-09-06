@@ -16,5 +16,5 @@ axis_view = 'x_axial'
 model = buildmodel(components, beam_z=1.7, beam_type=axis_view,
                    num_rays=65, beam_semi_angle=0.15)
 
-fig, ax = show_matplotlib(model)
+fig, ax = show_matplotlib(model, name = 'model_sem.svg')
 fig.suptitle('SEM Model', fontsize=32)

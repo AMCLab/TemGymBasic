@@ -1,0 +1,27 @@
+from components import Lens, DoubleDeflector, Sample
+from model import buildmodel
+from main import show_matplotlib
+
+#Showing Beam Shift Pivot Point
+components = [DoubleDeflector(name='Double Deflector', z_up=0.80, z_low=0.60, updefx=0.4, lowdefx=-0.4),
+              Sample(name='Sample', z=0.4),
+              Lens(name='Lens', z=0.20, f=-0.2),
+              ]
+
+axis_view = 'x_axial'
+model = buildmodel(components, beam_z=1.0, beam_type='x_axial',
+                   num_rays=64, beam_semi_angle=0.0001)
+
+show_matplotlib(model, name='beam_shift_basic.svg')
+
+#Showing Beam Tilt Pivot Point
+components = [DoubleDeflector(name='Double Deflector', z_up=0.80, z_low=0.60, updefx=0.4, lowdefx=-0.8),
+              Sample(name='Sample', z=0.4),
+              Lens(name='Lens', z=0.20, f=-0.2),
+              ]
+
+axis_view = 'x_axial'
+model = buildmodel(components, beam_z=1.0, beam_type='x_axial',
+                   num_rays=64, beam_semi_angle=0.0001)
+
+show_matplotlib(model, name='beam_tilt_basic.svg')

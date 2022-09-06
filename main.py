@@ -56,12 +56,12 @@ class LinearTEMUi(QMainWindow):
         self.detector_dock = Dock("Detector", size=(5, 5))
         self.gui_dock = Dock("GUI", size=(10, 3))
 
-        # place d2 at right edge of d1
+
         self._centralWidget.addDock(self.tem_dock, "left")
-        # place d3 at right edge of d2
-        self._centralWidget.addDock(self.detector_dock, "right", self.tem_dock)
-        # place d4 at bottom edge
-        self._centralWidget.addDock(self.gui_dock, "bottom")
+
+        self._centralWidget.addDock(self.detector_dock, "bottom", self.tem_dock)
+
+        self._centralWidget.addDock(self.gui_dock, "right")
         
         #create detector
         scale = self._model.detector_size/2
@@ -278,7 +278,7 @@ def run_pyqt(model):
     sys.exit(AppWindow.exec_())
     
 
-def show_matplotlib(model):
+def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
     rays = model.step()
 
     x, y, z = rays[:, 0, :], rays[:, 2, :], model.z_positions
@@ -316,8 +316,8 @@ def show_matplotlib(model):
     ray_alpha = 1
 
     ray_lw = 0.25
-    edge_lw = 1
-    component_lw = 4
+    edge_lw = edge_lw
+    component_lw = component_lw
 
     plot_rays = True
     highlight_edges = True
@@ -508,6 +508,6 @@ def show_matplotlib(model):
     ax.plot([-model.detector_size/2, model.detector_size/2],
             [0, 0], color='dimgrey', alpha=1, linewidth=component_lw)
 
-    plt.savefig('model_tem.svg', dpi=500)
+    plt.savefig(name, dpi=500)
 
     return fig, ax
