@@ -12,7 +12,11 @@ axis_view = 'x_axial'
 model = buildmodel(components, beam_z=1.0, beam_type='x_axial',
                    num_rays=32, beam_semi_angle=0.15)
 
-show_matplotlib(model, name = 'basic_biprism.svg')
+name = 'biprism_model.svg'
+fig, ax = show_matplotlib(model, name = name)
+fig.suptitle('Basic Biprism', fontsize=32)
+fig.savefig(name, dpi = 500)
+
 
 
 

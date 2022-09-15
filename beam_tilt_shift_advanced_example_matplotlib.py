@@ -14,4 +14,7 @@ axis_view = 'x_axial'
 model = buildmodel(components, beam_z=1.5, beam_type='x_axial',
                    num_rays=32, beam_semi_angle=0.15)
 
-show_matplotlib(model, name = 'beam_tilt.svg')
+name = 'beam_tilt.svg'
+fig, ax = show_matplotlib(model, name = name)
+fig.suptitle('Beam Pivot Points', fontsize=32)
+fig.savefig(name, dpi = 500)

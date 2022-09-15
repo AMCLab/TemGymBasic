@@ -29,5 +29,8 @@ axis_view = 'x_axial'
 model = buildmodel(components, beam_z=3.5, beam_type='x_axial',
                    num_rays=32, beam_semi_angle=0.15)
 
-fig, ax = show_matplotlib(model, name = 'model_tem.svg', component_lw = 3, edge_lw = 0.5)
+name = 'model_tem.svg'
+fig, ax = show_matplotlib(model, name = name)
 fig.suptitle('TEM Model', fontsize=32)
+fig.savefig(name, dpi = 500)
+

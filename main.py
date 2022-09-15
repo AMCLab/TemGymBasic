@@ -287,7 +287,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
 
     fig, ax = plt.subplots(figsize=(8, 20))
 
-    ax.set_ylabel('z axis (a.u)')
+    # ax.set_ylabel('z axis (a.u)')
     ax.tick_params(axis='both', which='major', labelsize=14)
     ax.tick_params(axis='both', which='minor', labelsize=12)
     ax.spines['top'].set_visible(False)
@@ -507,7 +507,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
     ax.text(label_x, -0.01, 'Detector', fontsize=label_fontsize)
     ax.plot([-model.detector_size/2, model.detector_size/2],
             [0, 0], color='dimgrey', alpha=1, linewidth=component_lw)
-
-    plt.savefig(name, dpi=500)
+    
+    # plt.savefig(name, dpi=500)
 
     return fig, ax
