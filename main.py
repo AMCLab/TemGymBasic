@@ -19,8 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-mpl.rcParams['mathtext.fontset'] = 'stix'
-mpl.rcParams['font.family'] = 'STIXGeneral'
+mpl.rcParams['font.family'] = 'Helvetica'
 mpl.rc('axes', titlesize=32, labelsize=28)
 
 __version__ = "0.1"
@@ -278,14 +277,12 @@ def run_pyqt(model):
     sys.exit(AppWindow.exec_())
     
 
-def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
+def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, label_fontsize = 20):
     rays = model.step()
 
     x, y, z = rays[:, 0, :], rays[:, 2, :], model.z_positions
 
-    label_fontsize = 12
-
-    fig, ax = plt.subplots(figsize=(8, 20))
+    fig, ax = plt.subplots(figsize=(12, 20))
 
     # ax.set_ylabel('z axis (a.u)')
     ax.tick_params(axis='both', which='major', labelsize=14)
@@ -293,16 +290,24 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
     ax.grid(color='lightgrey', linestyle='--', linewidth=0.5)
     ax.grid(which='minor', color='#EEEEEE', linestyle=':', linewidth=0.5)
-    ax.minorticks_on()
+    ax.set_yticks([])
+    ax.set_yticklabels([])
+    
+    # for tick in ax.yaxis.get_major_ticks():
+    #     tick.tick1line.set_visible(False)
+    #     tick.tick2line.set_visible(False)
+    #     tick.label1.set_visible(False)
+    #     tick.label2.set_visible(False)
 
     ax.get_xaxis().set_ticks(
         [-model.detector_size/2, 0, model.detector_size/2])
     ax.set_xlim([-0.5, 0.5])
     ax.set_ylim([0, model.beam_z])
     ax.set_aspect('equal', adjustable='box')
-    ax.text(0, model.beam_z, 'Electron Gun', fontsize=label_fontsize)
+    ax.text(0, model.beam_z, 'Electron Gun', fontsize=label_fontsize, zorder = 1000)
 
     idx = 1
 
@@ -347,7 +352,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
 
         if component.type == 'Biprism':
             ax.text(label_x, component.z-0.01,
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
 
             if model.beam_type == 'x_axial' and component.theta == 0:
                 ax.plot(component.points[0, :], component.points[2,
@@ -360,7 +365,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
         elif component.type == 'Quadrupole':
             r = component.radius
             ax.text(label_x, component.z-0.01, 'Upper ' +
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
             ax.plot([-r, -r/2], [z[idx], z[idx]],
                     color='lightcoral', alpha=1, linewidth=component_lw, zorder=999)
             ax.plot([-r/2, 0], [z[idx], z[idx]],
@@ -375,7 +380,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
 
         elif component.type == 'Aperture':
             ax.text(label_x, component.z-0.01,
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
             ri = component.aperture_radius_inner
             ro = component.aperture_radius_outer
 
@@ -392,7 +397,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
         elif component.type == 'Double Deflector':
             r = component.radius
             ax.text(label_x, component.z_up-0.01, 'Upper ' +
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
             ax.plot([-r, 0], [z[idx], z[idx]],
                     color='lightcoral', alpha=1, linewidth=component_lw, zorder=999)
             ax.plot([0, r], [z[idx], z[idx]],
@@ -420,7 +425,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
                             color=ray_color, linewidth=ray_lw, alpha=ray_alpha, zorder=1)
 
             ax.text(label_x, component.z_low-0.01,
-                    'Lower ' + component.name, fontsize=label_fontsize)
+                    'Lower ' + component.name, fontsize=label_fontsize, zorder = 1000)
             ax.plot([-r, 0], [z[idx], z[idx]],
                     color='lightcoral', alpha=1, linewidth=component_lw, zorder=999)
             ax.plot([0, r], [z[idx], z[idx]],
@@ -431,7 +436,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
 
         elif component.type == 'Lens':
             ax.text(label_x, component.z-0.01,
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
             ax.add_patch(mpl.patches.Arc((0, component.z), component.radius*2, height=0.05,
                                          theta1=0, theta2=180, linewidth=1, fill=False, zorder=-1, edgecolor='k'))
             ax.add_patch(mpl.patches.Arc((0, component.z), component.radius*2, height=0.05,
@@ -441,7 +446,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
 
         elif component.type == 'Astigmatic Lens':
             ax.text(label_x, component.z-0.01,
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
             ax.add_patch(mpl.patches.Arc((0, component.z), component.radius*2, height=0.05,
                                          theta1=0, theta2=180, linewidth=1, fill=False, zorder=-1, edgecolor='k'))
             ax.add_patch(mpl.patches.Arc((0, component.z), component.radius*2, height=0.05,
@@ -451,7 +456,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
         elif component.type == 'Deflector':
             r = component.radius
             ax.text(label_x, component.z-0.01,
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
             ax.plot([-r, 0], [z[idx], z[idx]],
                     color='lightcoral', alpha=1, linewidth=component_lw, zorder=999)
             ax.plot([0, r], [z[idx], z[idx]],
@@ -462,7 +467,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
             idx += 1
         elif component.type == 'Sample':
             ax.text(label_x, component.z-0.01,
-                    component.name, fontsize=label_fontsize)
+                    component.name, fontsize=label_fontsize, zorder = 1000)
             w = component.width
             ax.plot([component.x-w/2, component.x+w/2], [z[idx], z[idx]],
                     color='dimgrey', alpha=0.8, linewidth=3)
@@ -504,7 +509,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1):
             ax.plot(x[idx-1:idx+1, allowed_rays], z[idx-1:idx+1],
                     color=ray_color, linewidth=ray_lw, alpha=ray_alpha, zorder=1)
 
-    ax.text(label_x, -0.01, 'Detector', fontsize=label_fontsize)
+    ax.text(label_x, -0.01, 'Detector', fontsize=label_fontsize, zorder = 1000)
     ax.plot([-model.detector_size/2, model.detector_size/2],
             [0, 0], color='dimgrey', alpha=1, linewidth=component_lw)
     
