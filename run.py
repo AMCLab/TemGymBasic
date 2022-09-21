@@ -175,7 +175,7 @@ class LinearTEMCtrl:
         else:
             self.timer.stop()
 
-    def _connectSignals(self):
+    def connectSignals(self):
         # """Connect signals and gui"""
         self.model.gui.rayslider.valueChanged.connect(self.update)
         self.model.gui.checkBoxParalell.stateChanged.connect(self.update)

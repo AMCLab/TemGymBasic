@@ -5,7 +5,6 @@ from components import (Lens, Deflector, DoubleDeflector, Biprism, Aperture,
 from model import buildmodel
 from run import run_pyqt
 
-# def main():
 #Create List of Components
 components = [AstigmaticLens(name = 'Astigmatic Lens', z = 1.2),
               Lens(name = 'Lens', z = 1.0),
@@ -21,6 +20,3 @@ model = buildmodel(components, beam_z = 1.5, beam_type = 'point',
 
 #Run Pyqtgraph Interface
 run_pyqt(model)
-
-# if __name__ == "__main__":
-#     main()

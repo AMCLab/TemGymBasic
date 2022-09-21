@@ -1,7 +1,7 @@
 import sys
 sys.path.append(r"..")
 from components import Lens, DoubleDeflector, Sample
-from model import buildmodel
+from model import Model
 from run import run_pyqt
 
 #Create List of Components
@@ -13,8 +13,8 @@ components = [Lens(name = 'Condenser Lens', z = 1.2, f = -0.1),
               Lens(name = 'Projector Lens', z = 0.1, f = -0.1)]
 
 #Generate Model
-model = buildmodel(components, beam_z = 1.5, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.03)
+model_ = Model(components, beam_z = 1.5, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.03)
 
 
-run_pyqt(model)
+run_pyqt(model_)
         

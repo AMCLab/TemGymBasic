@@ -67,7 +67,7 @@ class Lens():
         self.f = self.gui.fslider.value()*1e-3
 
         if self.gui.fwobble.isChecked():
-            self.f = np.abs(np.sin(-1*2*np.pi*0.5e-2*self.ftime))*-0.05-0.01
+            self.f += np.abs(np.sin(-1*2*np.pi*0.5e-2*self.ftime))*-0.1
             self.ftime += 1
 
         self.set_flabel()
@@ -552,6 +552,10 @@ class Aperture():
     def set_gui_label(self):
         self.gui.radiuslabel.setText(
             'Aperture Radius = ' + "{:.4f}".format(self.aperture_radius_inner))
+        self.gui.xlabel.setText(
+            'Aperture X Position = ' + "{:.4f}".format(self.x))
+        self.gui.ylabel.setText(
+            'Aperture Y Position = ' + "{:.4f}".format(self.y))
         
         
     def set_matrix(self):
