@@ -19,7 +19,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         
-        #make layout
+        #make the GUI layout
         self.layout = QVBoxLayout(self)
         self.createbuttons()
         self.show()

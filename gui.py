@@ -317,8 +317,8 @@ class BiprismGui():
         self.box = QGroupBox(name)
         self.defslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.defslider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.defslider.setMinimum(-9000)
-        self.defslider.setMaximum(9000)
+        self.defslider.setMinimum(-2000)
+        self.defslider.setMaximum(2000)
         self.defslider.setValue(int(round(deflection*1000)))
         self.defslider.setTickPosition(QSlider.TicksBelow)
 
