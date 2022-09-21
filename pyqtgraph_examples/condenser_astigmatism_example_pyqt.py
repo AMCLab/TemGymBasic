@@ -2,7 +2,7 @@ import sys
 sys.path.append(r"..")
 from components import AstigmaticLens, Quadrupole
 from model import buildmodel
-from main import run_pyqt
+from run import run_pyqt
 
 components = [
     AstigmaticLens(name='Condenser Lens', z=0.7, fx=-0.4, fy=-0.6),

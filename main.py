@@ -268,13 +268,13 @@ class LinearTEMCtrl:
         self._view.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
 
 def run_pyqt(model):
-    AppWindow = QApplication(sys.argv)
-    AppWindow.setStyleSheet("QLabel{font-size: 10pt;}")
+    # AppWindow = QApplication(sys.argv)
+    # AppWindow.setStyleSheet("QLabel{font-size: 10pt;}")
     
     viewer = LinearTEMUi(model)
     LinearTEMCtrl(model, viewer)
     viewer.show()
-    sys.exit(AppWindow.exec_())
+    # sys.exit(AppWindow.exec_())
     
 
 def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, label_fontsize = 20):

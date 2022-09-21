@@ -2,7 +2,7 @@ import sys
 sys.path.append(r"..")
 from components import Lens, Quadrupole, DoubleDeflector, Aperture, Biprism
 from model import buildmodel
-from main import run_pyqt
+from run import run_pyqt
 
 components = [Lens(name = 'Electrostatic Lens', z = 3, f = -0.2),
               DoubleDeflector(name = 'Gun Beam Deflectors', z_up = 2.8, z_low = 2.7),
@@ -28,3 +28,4 @@ components = [Lens(name = 'Electrostatic Lens', z = 3, f = -0.2),
 
 model = buildmodel(components, beam_z = 3.5, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.03)
 run_pyqt(model)
+    

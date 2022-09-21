@@ -2,7 +2,7 @@ import sys
 sys.path.append(r"..")
 from components import Lens, DoubleDeflector, Aperture, Sample
 from model import buildmodel
-from main import run_pyqt
+from run import run_pyqt
 
 components = [Lens(name = '1st Condenser Lens', z = 1.5, f = -0.05),
               Aperture(name = 'Spray Aperture', z = 1.2, aperture_radius_inner = 0.05),
@@ -16,4 +16,3 @@ components = [Lens(name = '1st Condenser Lens', z = 1.5, f = -0.05),
 model = buildmodel(components, beam_z = 1.7, beam_type = 'point', 
                    num_rays = 64, beam_semi_angle = 0.15)
 run_pyqt(model)
-
