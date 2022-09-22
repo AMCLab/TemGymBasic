@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton
 from collections import OrderedDict
 import sys
 import subprocess
+import numpy as np
 
 examples = OrderedDict([
     ('Advanced Beam Tilt/Shift', 'beam_tilt_shift_advanced_example_pyqt.py'),
