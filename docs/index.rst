@@ -30,12 +30,11 @@ Features
 
 * Generate publication quality ray diagrams of electron microscope experimental setups with one function call. 
 
-Content
--------
 
 .. toctree::
-   :maxdepth: 1
-   
+   :maxdepth: 2
+   :caption: Contents
+
    source/usage
 
 
