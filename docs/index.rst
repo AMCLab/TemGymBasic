@@ -35,7 +35,7 @@ Content
 
 .. toctree::
    :maxdepth: 1
-   
-   source/usage
+
+   source/usage.rst
 
 
