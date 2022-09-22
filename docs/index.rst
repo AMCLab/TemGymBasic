@@ -22,23 +22,18 @@ Features
 
 * Interactive TEM models generated with pyqtgraph & PyQt5.
 
-* Ready-made example direct alignment models that enable users to learn about alignments at their own pace in an offline manner.
+* Ready-made example direct alignment models that enable users to learn at their own pace in an offline manner.
 
 * Generate interactive models of a transmission & scanning electron microscope.
 
 * Easy to use python code which allows users to create their own models by naming components inside a python list.
 
-* Generate publication quality ray diagrams of electron microscope experimental Setups with one function call. 
+* Generate publication quality ray diagrams of electron microscope experimental setups with one function call. 
 
 Content
 -------
 
 .. toctree::
    :maxdepth: 1
-
-   source/about
    source/usage
-   source/examples
-   source/credits
-   source/license
 
