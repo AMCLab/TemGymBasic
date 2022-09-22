@@ -9,7 +9,7 @@ TomoBank
 
 
 .. image:: source/img/GUI_graphic.svg
-   :width: 320px
+   :width: 900px
    :alt: project
 
 The X-ray Tomography Data Bank or TomoBank, provides a repository of experimental 
