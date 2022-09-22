@@ -36,6 +36,6 @@ Content
 .. toctree::
    :maxdepth: 1
    
-   index
    source/usage
+
 
