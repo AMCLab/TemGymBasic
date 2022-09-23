@@ -7,13 +7,14 @@
 TemGym Basic
 =============
 
+TemGym Basic is a ray-tracing software that models and visualises the first order behaviour of 
+components inside a transmission electron microscope.
 
 .. image:: source/img/GUI_graphic.svg
    :width: 900px
    :alt: project
 
-TemGym Basic is a ray-tracing software that models and visualises the first order behaviour of 
-components inside a transmission electron microscope. The interactive models we generate are designed with a focus
+ The interactive models we generate are designed with a focus
 on educating new users how some of the basic alignments work inside a TEM. Our code is also capable of producing publication
 quality ray diagrams with a single function call. 
 
@@ -32,7 +33,7 @@ Features
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents
 
    source/usage
