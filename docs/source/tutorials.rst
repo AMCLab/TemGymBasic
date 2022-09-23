@@ -1,8 +1,12 @@
 ========
 Examples
 ========
-Beam Tilt/Shift basic tutorial
-------------------------------
+
+Lens & Rotation Centre Guide
+----------------------------
+
+Beam Tilt/Shift Guide
+---------------------
 In this basic model of the beam shift/tilt alignment, we use a pair of deflectors, a lens,
 and a detector to bring the alignment diagram to life. 
 For the beam shift and beam tilt alignment, the goal is to find the "deflector ratio" setting
@@ -34,3 +38,18 @@ Beam Tilt Alignment
 ---------------------
 Now adjust the deflector ratio so that it is set to -2, and see that the beam tilts about a single point 
 in the sample plane on the 3D viewer. 
+
+Condenser Astigmatism
+---------------------
+
+Condenser Aperture
+------------------
+
+Biprism
+-------
+
+Model TEM
+---------
+
+Model SEM
+---------
