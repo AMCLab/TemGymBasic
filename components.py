@@ -422,6 +422,7 @@ class DoubleDeflector():
         
         if self.gui.xbuttonwobble.isChecked():
             self.updefx = (np.sin(-1*2*np.pi*1e-2*self.xtime))
+            
             self.lowdefx = self.updefx*self.defratiox
             self.xtime += 1
         if self.gui.ybuttonwobble.isChecked():
