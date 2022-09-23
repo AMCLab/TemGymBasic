@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-========
+=============
 TemGym Basic
-========
+=============
 
 
 .. image:: source/img/GUI_graphic.svg
@@ -36,5 +36,6 @@ Features
    :caption: Contents
 
    source/usage
+   source/tutorials
 
 
