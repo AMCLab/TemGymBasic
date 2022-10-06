@@ -284,9 +284,6 @@ class LinearTEMCtrl:
 #Main code to run a pyqt model
 def run_pyqt(model):
     
-    #Create application
-    AppWindow = QApplication(sys.argv) 
-    
     #Generate the GUI
     viewer = LinearTEMUi(model)
     
@@ -296,9 +293,6 @@ def run_pyqt(model):
     #Show the viewer
     viewer.show()
     
-    #Exit application if window is closed
-    sys.exit(AppWindow.exec_())
-
 #Example code to make a matplotlib plot
 def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, label_fontsize = 20):
     

@@ -5,9 +5,9 @@ sys.path.append(r"..")
 from components import (Lens, Deflector, DoubleDeflector, Biprism, Aperture, 
                         AstigmaticLens, Quadrupole)
 
-from model import buildmodel
+from model import Model
 import numpy as np
-from main import show_matplotlib
+from run import show_matplotlib
 
 #Create List of Components
 components = [Lens(name='Lens', z=0.85),
@@ -19,9 +19,9 @@ components = [Lens(name='Lens', z=0.85),
               Aperture(name='Aperture', z=0.10, aperture_radius_inner=0.05)]
 
 #Generate TEM Model
-model = buildmodel(components, beam_z=1, beam_type='x_axial',
+model_ = Model(components, beam_z=1, beam_type='x_axial',
                    num_rays=32, beam_semi_angle=0.15)
 
 #Save Figure with Matplotlib
-fig, ax = show_matplotlib(model, name = 'all_components.svg', label_fontsize = 18)
+fig, ax = show_matplotlib(model_, name = 'all_components.svg', label_fontsize = 18)
 fig.savefig('all_components.svg', dpi = 500)

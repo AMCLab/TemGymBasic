@@ -1,8 +1,8 @@
 import sys
 sys.path.append(r"..")
-from components import Lens, Deflector, DoubleDeflector, Biprism, Aperture, AstigmaticLens, Quadrupole
-from model import buildmodel
-from main import show_matplotlib
+from components import Lens, DoubleDeflector, Aperture, Quadrupole
+from model import Model
+from run import show_matplotlib
 
 components = [Lens(name = 'Electrostatic Lens', z = 3, f = -0.2),
               DoubleDeflector(name = 'Gun Beam Deflectors', z_up = 2.8, z_low = 2.7),
@@ -27,11 +27,11 @@ components = [Lens(name = 'Electrostatic Lens', z = 3, f = -0.2),
               ]
 
 axis_view = 'x_axial'
-model = buildmodel(components, beam_z=3.5, beam_type='x_axial',
+model_ = Model(components, beam_z=3.5, beam_type='x_axial',
                    num_rays=32, beam_semi_angle=0.15)
 
 name = 'model_tem.svg'
-fig, ax = show_matplotlib(model, name = name, label_fontsize = 14)
+fig, ax = show_matplotlib(model_, name = name, label_fontsize = 14)
 fig.suptitle('TEM Model', fontsize=32)
 fig.savefig(name, dpi = 500)
 

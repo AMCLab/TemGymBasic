@@ -9,11 +9,14 @@ TemGym Basic
 
 TemGym Basic is a ray-tracing software that models and visualises the first order behaviour of 
 components inside a transmission electron microscope.
+
 .. image:: source/img/GUI_graphic.svg
    :width: 900px
    :alt: project
+
 The interactive models we generate are designed with a focus
-on educating new users how some of the basic alignments work inside a TEM. Our code is also capable of producing publication
+on educating new users on how the basic alignments work inside a TEM. 
+Our code is also capable of producing publication
 quality ray diagrams with a single function call. 
 
 Features
@@ -29,6 +32,45 @@ Features
 
 * Generate publication quality ray diagrams of electron microscope experimental setups with one function call. 
 
+Component Overview
+------------------
+Our python code consists of 8 different electron microscope components which can be combined
+to create a model microscope. 
+
+* Lens
+* Astigmatic Lens
+* Deflector
+* Double Deflector
+* Aperture
+* Stigmator
+* Biprism
+* Sample
+
+We can easily create an example model containing all of these components by first importing the required packages
+into a python script.
+
+.. literalinclude:: ../pyqtgraph_examples/all_components_example_pyqt.py
+   :language: python
+   :lines: 1-6
+
+Then we add the components into a list, and specify their position inside the microscope on the z-axis.
+
+.. literalinclude:: ../pyqtgraph_examples/all_components_example_pyqt.py
+   :language: python
+   :lines: 8-19
+
+Then input the model into our pyqt function that creates the interactive 3D viewer and automatically populates
+the GUI.
+
+.. literalinclude:: ../pyqtgraph_examples/all_components_example_pyqt.py
+   :language: python
+   :lines: 21-22
+
+which generates an interactive window on your PC. 
+
+.. image:: source/img/all_components_example.png
+   :width: 500px
+   :alt: project
 
 .. toctree::
    :maxdepth: 1
@@ -36,5 +78,6 @@ Features
 
    source/usage
    source/tutorials
-
+   source/showcases
+   source/matplotlib
 

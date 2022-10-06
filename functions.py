@@ -9,7 +9,20 @@ import numpy as np
 
 
 def circular_beam(r, outer_radius):
+    '''Generate a circular beam where rays are populated 
 
+    Parameters
+    ----------
+    r : _type_
+        _description_
+    outer_radius : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    '''
     num_rays = r.shape[2]
 
     #Use the equation from stack overflow about ukrainian graves

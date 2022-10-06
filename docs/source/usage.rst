@@ -1,6 +1,6 @@
-=====
-Usage
-=====
+============
+Installation
+============
 Quickstart
 ----------
 Download and run the example executable for your plafrom (Windows, MACOS or Ubuntu) from here to begun using some 

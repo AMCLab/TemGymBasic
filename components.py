@@ -67,7 +67,7 @@ class Lens():
         self.f = self.gui.fslider.value()*1e-3
 
         if self.gui.fwobble.isChecked():
-            self.f += np.abs(np.sin(-1*2*np.pi*0.5e-2*self.ftime))*-0.4
+            self.f += np.abs(np.sin(-1*2*np.pi*3e-2*self.ftime))*-0.6
             self.ftime += 1
 
         self.set_flabel()
