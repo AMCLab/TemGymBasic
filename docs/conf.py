@@ -21,10 +21,6 @@ project = 'TemGym'
 copyright = '2022, David Landers'
 author = 'David Landers'
 
-# The full version, including alpha/beta/rc tags
-release = '0.5'
-
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -37,7 +33,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'sphinx.ext.sphinx_licenseinfo']
+    'sphinx_licenseinfo']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
