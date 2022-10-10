@@ -1,5 +1,5 @@
-import geometry as geom
-from gui import *
+import temgymbasic.geometry as geom
+from temgymbasic.gui import *
 import pyqtgraph.opengl as gl
 import numpy as np
 from PyQt5.QtGui import QFont

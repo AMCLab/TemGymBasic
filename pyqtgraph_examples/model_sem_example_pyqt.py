@@ -1,8 +1,9 @@
 from temgymbasic import components as comp
 from temgymbasic.model import Model
 from temgymbasic.run import run_pyqt
-from pyqt5 import QApplication
+from PyQt5.QtWidgets import QApplication
 import sys 
+
 
 def main():
     components = [comp.Lens(name = '1st Condenser Lens', z = 1.5, f = -0.1),

@@ -1,7 +1,7 @@
 
 import numpy as np
-from functions import circular_beam, point_beam, axial_point_beam, x_axial_point_beam
-from gui import ModelGui
+from temgymbasic.functions import circular_beam, point_beam, axial_point_beam, x_axial_point_beam
+from temgymbasic.gui import ModelGui
 
 '''This class create the model composed of the specified components, and handles all of the computation
 that transmits the rays through each component.'''

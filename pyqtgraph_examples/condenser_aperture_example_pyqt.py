@@ -1,7 +1,7 @@
 from temgymbasic import components as comp
 from temgymbasic.model import Model
 from temgymbasic.run import run_pyqt
-from pyqt5 import QApplication
+from PyQt5.QtWidgets import QApplication
 import sys 
 
 def main():

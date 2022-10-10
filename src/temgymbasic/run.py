@@ -1,5 +1,5 @@
 from functools import partial
-from functions import get_image_from_rays
+from temgymbasic.functions import get_image_from_rays
 
 import PyQt5
 from PyQt5.QtWidgets import QMainWindow
