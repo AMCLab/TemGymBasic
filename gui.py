@@ -14,42 +14,63 @@ from pyqtgraph.Qt import QtCore
 from functools import partial
 
 '''This code makes the GUI interface for each component. 
-There is a lot of boilerplate in this section'''
+There is a lot of copypaste in this section'''
 
 class LensGui():
-    def __init__(self, name, f):
 
-        self.box = QGroupBox(name)
-        self.fslider = QSlider(QtCore.Qt.Orientation.Horizontal)
-        self.fslider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.fslider.setMinimum(-1000)
-        self.fslider.setMaximum(-10)
-        self.fslider.setValue(int(round(f*1000)))
-        self.fslider.setTickPosition(QSlider.TicksBelow)
+        def __init__(self, name, f):
+            '''GUI for the Lens component
+            ----------
+            name : str
+                Name of component
+            f : float
+                Focal length
+            '''
+            self.box = QGroupBox(name)
+            self.fslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+            self.fslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+            self.fslider.setMinimum(-1000)
+            self.fslider.setMaximum(-10)
+            self.fslider.setValue(int(round(f*1000)))
+            self.fslider.setTickPosition(QSlider.TicksBelow)
 
-        self.flabel = QLabel('Focal Length = ' + "{:.2f}".format(f))
-        self.flabel.setMinimumWidth(80)
-        self.fwobble = QCheckBox('Wobble Lens Current')
+            self.flabel = QLabel('Focal Length = ' + "{:.2f}".format(f))
+            self.flabel.setMinimumWidth(80)
+            self.fwobble = QCheckBox('Wobble Lens Current')
 
-        hbox = QHBoxLayout()
-        hbox_labels = QHBoxLayout()
-        hbox_labels.addWidget(self.flabel)
-        hbox.addSpacing(10)
-        hbox.addWidget(self.fslider)
-        hbox.addSpacing(5)
-        hbox.addWidget(self.fwobble)
+            hbox = QHBoxLayout()
+            hbox_labels = QHBoxLayout()
+            hbox_labels.addWidget(self.flabel)
+            hbox.addSpacing(10)
+            hbox.addWidget(self.fslider)
+            hbox.addSpacing(5)
+            hbox.addWidget(self.fwobble)
 
-        vbox = QVBoxLayout()
-        vbox.addLayout(hbox_labels)
-        vbox.addLayout(hbox)
-        vbox.addStretch()
+            vbox = QVBoxLayout()
+            vbox.addLayout(hbox_labels)
+            vbox.addLayout(hbox)
+            vbox.addStretch()
 
-        self.box.setLayout(vbox)
+            self.box.setLayout(vbox)
 
 
 class AstigmaticLensGui():
+    '''Gui for the Astigmatic Lens component
+    '''    
     def __init__(self, name, gui_label, fx, fy):
+        '''
 
+        Parameters
+        ----------
+        name : str
+            Name of component
+        gui_label : str
+            Label of focal length slider in GUI
+        fx : float
+            Focal length in x axis
+        fy : float
+            Focal length in y axis
+        '''
         self.box = QGroupBox(name)
         self.fxslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.fxslider.setTickPosition(QSlider.TickPosition.TicksBelow)
@@ -95,8 +116,20 @@ class AstigmaticLensGui():
 
 
 class SampleGui():
+    '''Gui to allow a user to move the sample in the 3D model
+    '''    
     def __init__(self, name, x, y):
+        '''
 
+        Parameters
+        ----------
+        name : str
+            Name of the component
+        x : float
+            X position of component
+        y : float
+            Y position of component
+        '''
         self.box = QGroupBox(name)
         self.xslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.xslider.setTickPosition(QSlider.TickPosition.TicksBelow)
@@ -142,8 +175,20 @@ class SampleGui():
 
 
 class DeflectorGui():
+    '''GUI for the deflector component
+    '''    
     def __init__(self, name, defx, defy):
+        '''
 
+        Parameters
+        ----------
+        name : str
+            Name of component
+        defx : float
+            Initial X deflection of deflector
+        defy : float
+            Initial Y deflection of deflector
+        '''
         self.box = QGroupBox(name)
         self.defxslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.defxslider.setTickPosition(QSlider.TickPosition.TicksBelow)
@@ -188,7 +233,24 @@ class DeflectorGui():
 
 
 class DoubleDeflectorGui():
+    '''GUI for the double deflector component
+    '''    
     def __init__(self, name, updefx, updefy, lowdefx, lowdefy):
+        '''
+
+        Parameters
+        ----------
+        name : str
+            Name of component
+        updefx : float
+            Initial X deflection of upper deflector
+        updefy : float
+            Initial Y deflection of upper deflector
+        lowdefx : float
+            Initial X deflection of lower deflector
+        lowdefy : float
+            Initial Y deflection of lower deflector
+        '''        
         self.button_wobble = QCheckBox("Wobble Upper Deflector")
         self.box = QGroupBox(name)
         self.updefxslider = QSlider(QtCore.Qt.Orientation.Horizontal)
@@ -312,8 +374,22 @@ class DoubleDeflectorGui():
 
 
 class BiprismGui():
+    '''GUI for the biprism component
+    '''    
     def __init__(self, name, deflection, theta):
+        '''
 
+        Parameters
+        ----------
+        name : str
+            Name of component
+        deflection : float
+            Deflection angle in Slope units
+        theta : float
+            Angle of biprism. Determines if the biprism creates deflects in the x or y direction.
+            Two options: 0 or np.pi/2
+
+        '''
         self.box = QGroupBox(name)
         self.defslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.defslider.setTickPosition(QSlider.TickPosition.TicksBelow)
@@ -360,8 +436,24 @@ class BiprismGui():
 
 
 class ModelGui():
+    '''Overall GUI of the model
+    '''    
     def __init__(self, num_rays, beam_type, beam_semi_angle, beam_tilt_x, beam_tilt_y):
+        '''
 
+        Parameters
+        ----------
+        num_rays : int
+            Number of rays in the model
+        beam_type : str
+            Type of initial beam: Axial, paralell of point. 
+        beam_semi_angle : float
+            Semi angle of the beam 
+        beam_tilt_x : float
+            Initial x tilt of the beam in radians
+        beam_tilt_y : float
+            Initial y tilt of the beam in radians
+        '''
         self.box = QGroupBox('Model Settings')
         self.rayslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.rayslider.setTickPosition(QSlider.TickPosition.TicksBelow)
@@ -507,7 +599,12 @@ class ModelGui():
         self.box.setLayout(vbox)
 
     def uncheck(self, btn):
+        '''Determines which button is checked, and unchecks others
 
+        Parameters
+        ----------
+        btn : Pyqt5 Button
+        '''
         # checking if state is checked
         if btn.isChecked() == True:
 
@@ -534,8 +631,26 @@ class ModelGui():
 
 
 class ApertureGui():
+    '''GUI for the aperture component
+    '''    
     def __init__(self, name, min_radius, max_radius, inner_radius, x, y):
+        '''
 
+        Parameters
+        ----------
+        name : str
+            Name of component
+        min_radius : float
+            Minimum radius of the aperture
+        max_radius : float
+            Max radius of the aperture
+        inner_radius : float
+            Initial inner radius of the aperture
+        x : float
+            X position of component
+        y : float
+            y position of component
+        '''
         self.box = QGroupBox(name)
         self.radiusslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.radiusslider.setTickPosition(QSlider.TickPosition.TicksBelow)

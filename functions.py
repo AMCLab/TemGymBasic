@@ -1,31 +1,27 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri May 27 11:55:02 2022
 
-@author: andy
-"""
 import numpy as np
 
 
 def circular_beam(r, outer_radius):
-    '''Generate a circular beam where rays are populated 
+    '''Generates a circular paralell initial beam 
 
     Parameters
     ----------
-    r : _type_
-        _description_
-    outer_radius : _type_
-        _description_
+    r : ndarray
+        Ray position and slope matrix
+    outer_radius : float
+        Outer radius of the circular beam
 
     Returns
     -------
-    _type_
-        _description_
+    r : ndarray
+        Updated ray position & slope matrix which create a circular beam
+    num_points_kth_ring: ndarray
+        Array of the number of points on each ring of our circular beam
     '''
     num_rays = r.shape[2]
 
-    #Use the equation from stack overflow about ukrainian graves
+    #Use the equation from stack overflow about ukrainian graves from 2014
     #to calculate the number of even rings including decimal remainder
     num_circles_dec = (-1+np.sqrt(1+4*(num_rays)/(np.pi)))/2
 
@@ -84,7 +80,22 @@ def circular_beam(r, outer_radius):
 
 
 def point_beam(r, beam_semi_angle):
+    '''Generates a point initial beam that spreads out with semi angle 'beam_semi_angle'
 
+    Parameters
+    ----------
+    r : ndarray
+        Ray position and slope matrix
+    beam_semi_angle : float
+        Beam semi angle in radians
+
+    Returns
+    -------
+    r : ndarray
+        Updated ray position & slope matrix which create a circular beam
+    num_points_kth_ring: ndarray
+        Array of the number of points on each ring of our circular beam
+    '''    
     num_rays = r.shape[2]
 
     #Use the equation from stack overflow about ukrainian graves
@@ -146,6 +157,21 @@ def point_beam(r, beam_semi_angle):
 
 
 def axial_point_beam(r, beam_semi_angle):
+    '''Generates a cross shaped initial beam on the x and y axis
+    that spreads out with semi angle 'beam_semi_angle'
+
+    Parameters
+    ----------
+    r : ndarray
+        Ray position and slope matrix
+    beam_semi_angle : float
+        Beam semi angle in radians
+
+    Returns
+    -------
+    r : ndarray
+        Updated ray position & slope matrix which create a circular beam
+    '''    
     num_rays = r.shape[2]
 
     x_rays = int(round(num_rays/2))
@@ -164,6 +190,21 @@ def axial_point_beam(r, beam_semi_angle):
 
 
 def x_axial_point_beam(r, beam_semi_angle):
+    '''Generates a cross shaped initial beam on the x axis
+    that spreads out with semi angle 'beam_semi_angle'
+
+    Parameters
+    ----------
+    r : ndarray
+        Ray position and slope matrix
+    beam_semi_angle : float
+        Beam semi angle in radians
+
+    Returns
+    -------
+    r : ndarray
+        Updated ray position & slope matrix which create a circular beam
+    '''    
     num_rays = r.shape[2]
 
     x_rays = int(round(num_rays))
@@ -176,7 +217,27 @@ def x_axial_point_beam(r, beam_semi_angle):
 
 
 def get_image_from_rays(rays_x, rays_y, detector_size, detector_pixels):
+    '''From an image of rays that hit the detector at the base of the TEM
 
+    Parameters
+    ----------
+    rays_x : ndarray
+        X position of rays that hit the detector
+    rays_y : ndarray
+        X position of rays that hit the detector
+    detector_size : float
+        Real size of the detector in the model. Single value that describes it's edge length.
+        Note that the detector is always square
+    detector_pixels : int
+        Resolution of the detector.
+
+    Returns
+    -------
+    detector_image : ndarray
+        Image of where rays have hit the detector
+    image_pixel_coords : ndarray
+        Coordinates of where reach ray has hit the detector
+    '''    
     detector_image = np.zeros((detector_pixels, detector_pixels), dtype=np.uint8)
 
     # set final image pixel coordinates

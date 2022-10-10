@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu May 26 16:43:42 2022
 
-@author: andy
-"""
 
 import numpy as np
 from functions import circular_beam, point_beam, axial_point_beam, x_axial_point_beam
@@ -13,30 +7,47 @@ from gui import ModelGui
 '''This class create the model composed of the specified components, and handles all of the computation
 that transmits the rays through each component.'''
 class Model():
-
+    '''Generates a model electron microscope. This class generates performs the matrix 
+    multiplication and function updates to calculate their positions throughout
+    the column.
+    '''
     def __init__(self, components, beam_z=1, num_rays=256, beam_type='point', 
                  beam_semi_angle=np.pi/4, beam_tilt_x=0, beam_tilt_y=0, beam_width = 0.2,
                  detector_size = 0.5, detector_pixels = 128):
         '''
-        beam_z - Sets the initial height of the beam
-        num_rays - Sets the number of rays generated at the beam_z position. A large 
-        number of rays will in general slow down the programme quite a lot. 
-        beam_type - Choose the type of beam:
+
+        Parameters
+        ----------
+        components : list
+            List of components to electron microscope component to input into the model
+        beam_z : int, optional
+            Sets the initial height of the beam, by default 1
+        num_rays : int, optional
+            Sets the number of rays generated at the beam_z position. A large 
+            number of rays will in general slow down the programme quite a lot. , by default 256
+        beam_type : str, optional
+            Choose the type of beam:
                     -'point' beam creates a set of rays that start from a single point and 
                      spread out like a cone.
                     -'paralell' beam creates a set of rays that start from the same position, but 
                     each have the same angle.
                     - 'axial' creates a beam which is only visible on the x and y axis.
                     - 'x_axial' creates a beam which is only visible on the x-axis. This is only used 
-                    for matplotlib diagrams.
-        'beam_semi_angle - Set the semi angle of the beam in radians.'
-        'beam_tilt_x - Set the tilt of the beam in the x direction.'
-        'beam_tilt_y - Set the tilt of the beam in the y direction.'
-        'beam_width - Set the width of the beam - only matters if "paralell" beam type is selected.'
-        'detector_size - Set the size of the detector.'
-        'detector_pixels - Set the number of pixels in the detector. A large number of pixels will 
-        probably considerably hinder performance.'
-        '''
+                    for matplotlib diagrams, by default 'point'
+        beam_semi_angle : float, optional
+            Set the semi angle of the beam in radians., by default np.pi/4
+        beam_tilt_x : int, optional
+            Set the tilt of the beam in the x direction, by default 0
+        beam_tilt_y : int, optional
+            Set the tilt of the beam in the y direction, by default 0
+        beam_width : float, optional
+            Set the width of the beam - only matters if "paralell" beam type is selected
+        detector_size : float, optional
+            Set the size of the detector, by default 0.5
+        detector_pixels : int, optional
+            Set the number of pixels in the detector. A large number of pixels will 
+            probably considerably hinder performance, by default 128
+        '''        
         self.components = components
         self.num_rays = num_rays
         self.beam_width = beam_width
@@ -62,6 +73,8 @@ class Model():
         self.detector_pixels = detector_pixels
 
     def set_z_positions(self):
+        '''Create the z position list of all components in the model
+        '''        
         self.z_positions = []
         
         #Input the initial beam_z as the first z_position
@@ -86,11 +99,14 @@ class Model():
     
     #Create the ModelGUI if we are running pyqtgraph
     def create_gui(self):
+        '''Create the GUI
+        '''        
         self.gui = ModelGui(self.num_rays, self.beam_type,
                             self.beam_semi_angle, self.beam_tilt_x, self.beam_tilt_y)
 
     def generate_rays(self):
-        
+        '''Generate electron rays
+        '''        
         #Make our 3D matrix of rays. This matrix is of shape (steps, 5, num rays), where
         #steps is defined by the number of components.
         
@@ -113,6 +129,8 @@ class Model():
     
     #Add the matrices of each component to a list
     def update_component_matrix(self):
+        '''Update the matrix of each component 
+        '''        
         self.components_matrix = []
         for idx, component in enumerate(self.components):
             if component.type == 'Double Deflector':
@@ -123,6 +141,9 @@ class Model():
     
     #Perform the matrix multiplication of the rays with each component in the model
     def update_rays_stepwise(self):
+        '''Perform the neccessary matrix multiplications and function multiplications
+        to propagate the beam through the column
+        '''        
         #Do the matrix multiplication of the first rays with the distance between the beam z 
         #and the first component
         self.r[1, :, :] = np.matmul(self.propagate(self.z_distances[0]), self.r[0, :, :])
@@ -181,6 +202,8 @@ class Model():
                 idx += 1
 
     def update_gui(self):
+        '''Update the GUI
+        '''        
         #This code updates the GUI sliders
         self.num_rays = 2**(self.gui.rayslider.value())
         self.beam_semi_angle = self.gui.beamangleslider.value()*1e-2
@@ -201,6 +224,8 @@ class Model():
         self.generate_rays()
 
     def set_model_labels(self):
+        '''Set labels of the model inside the GUI
+        '''        
         self.gui.raylabel.setText(
             str(self.num_rays))
         self.gui.beamanglelabel.setText(
@@ -216,6 +241,13 @@ class Model():
         )
 
     def step(self):
+        '''Master function that updates the matrices and perfroms ray propagation
+
+        Returns
+        -------
+        r : ndarray
+            Returns the array of ray positions
+        '''        
         #This method performs the computation of updating the matrices to their gui slider 
         #paramaters, and of moving the rays throgh the model.
         self.update_component_matrix()
@@ -225,6 +257,18 @@ class Model():
     
     #Propagation matrix used by the model to propagate rays between components
     def propagate(self, z):
+        '''Propagation matrix
+
+        Parameters
+        ----------
+        z : float
+            Distance to propagate rays
+
+        Returns
+        -------
+        ndarray
+            Propagation matrix
+        '''        
 
         matrix = np.array([[1, z, 0, 0, 0],
                            [0, 1, 0, 0, 0],

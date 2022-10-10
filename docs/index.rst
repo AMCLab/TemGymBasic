@@ -72,12 +72,30 @@ which generates an interactive window on your PC.
    :width: 500px
    :alt: project
 
+Contents
+--------
+
 .. toctree::
-   :maxdepth: 1
-   :caption: Contents
+   :maxdepth: 2
+   :caption: Tutorials
 
    source/usage
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples
+   
    source/tutorials
    source/showcases
    source/matplotlib
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Reference
+
+   source/documentation
+   source/license
+
+
+
+   

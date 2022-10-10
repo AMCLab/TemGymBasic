@@ -26,9 +26,23 @@ __author__ = "David Landers"
 
 #Create the UI class
 class LinearTEMUi(QMainWindow):
+    '''Create the UI Window
+
+    Parameters
+    ----------
+    QMainWindow : class
+        Pyqt5's Main window Class
+    '''    
     """LinearTEM's Viewer (GUI)."""
 
     def __init__(self, model):
+        '''Init important parameters
+
+        Parameters
+        ----------
+        model : class
+            Microscope model
+        '''        
         """View initializer."""
         super().__init__()
         
@@ -75,6 +89,8 @@ class LinearTEMUi(QMainWindow):
         self.createGUI()
 
     def create3DDisplay(self):
+        '''Create the 3D Display
+        '''        
         # Create the 3D TEM Widnow, and plot the components in 3D
         self.tem_window = gl.GLViewWidget()
         
@@ -103,6 +119,8 @@ class LinearTEMUi(QMainWindow):
         self.tem_dock.addWidget(self.tem_window)
 
     def createDetectorDisplay(self):
+        '''Create the detector display
+        '''        
         #Create the detector window, which shows where rays land at the bottom
         self.detector_window = pg.GraphicsLayoutWidget()
         self.detector_window.setAspectLocked(1.0)
@@ -117,7 +135,8 @@ class LinearTEMUi(QMainWindow):
         self.detector_dock.addWidget(self.detector_window)
 
     def createGUI(self):
-        
+        '''Create the gui display
+        '''        
         #Create the window which houses the GUI
         scroll = QScrollArea()
         scroll.setWidgetResizable(1)
@@ -138,10 +157,18 @@ class LinearTEMUi(QMainWindow):
     
 # Create a Controller class to connect the GUI and the model
 class LinearTEMCtrl:
-    """LinearTEM's Controller."""
-
+    '''Control code which links the model and 3D viewer
+    '''
     def __init__(self, model, view):
-        """Controller initializer."""
+        '''
+
+        Parameters
+        ----------
+        model : class
+            Microscope model
+        view : class
+            UI Viewer
+        '''        
         self.model = model
         self.view = view
         
@@ -155,6 +182,15 @@ class LinearTEMCtrl:
         self.update()
     
     def timerstart(self, btn, component):
+        '''Start a timer
+
+        Parameters
+        ----------
+        btn : PyQt5 Button
+            ''
+        component : class
+            Check which component GUI has clicked the button, so we know what timer to start
+        '''        
         # checking if button state is checked
         if btn.isChecked() == True:
             if component.type == 'Double Deflector':
@@ -176,7 +212,8 @@ class LinearTEMCtrl:
             self.timer.stop()
 
     def connectSignals(self):
-        # """Connect signals and gui"""
+        '''Connect the updates to the model to the GUI
+        '''        
         self.model.gui.rayslider.valueChanged.connect(self.update)
         self.model.gui.checkBoxParalell.stateChanged.connect(self.update)
         self.model.gui.checkBoxPoint.stateChanged.connect(self.update)
@@ -223,6 +260,13 @@ class LinearTEMCtrl:
                 component.gui.yslider.valueChanged.connect(self.update)
     
     def set_camera_params(self, btn):
+        '''
+
+        Parameters
+        ----------
+        btn : PyQt5 Button
+            ''
+        '''        
         if btn == self.model.gui.x_button:
             self.view.tem_window.setCameraParams(**self.view.x_camera_params)
         elif btn == self.model.gui.y_button:
@@ -231,7 +275,8 @@ class LinearTEMCtrl:
             self.view.tem_window.setCameraParams(**self.view.initial_camera_params)
             
     def update(self):
-        
+        '''Update the model
+        '''        
         self.model.update_gui()
         
         #update components
@@ -281,9 +326,15 @@ class LinearTEMCtrl:
 
         self.view.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
 
-#Main code to run a pyqt model
+
 def run_pyqt(model):
-    
+    '''Main code to run a pyqt model
+
+    Parameters
+    ----------
+    model : class
+        Microscope Model
+    '''    
     #Generate the GUI
     viewer = LinearTEMUi(model)
     
@@ -295,7 +346,28 @@ def run_pyqt(model):
     
 #Example code to make a matplotlib plot
 def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, label_fontsize = 20):
-    
+    '''Code to show a matplotlib model
+
+    Parameters
+    ----------
+    model : class
+        Microscope Model
+    name : str, optional
+        Name of file, by default 'model.svg'
+    component_lw : int, optional
+        Linewidth of component outline, by default 4
+    edge_lw : int, optional
+        Linewidth of highlight to edges, by default 1
+    label_fontsize : int, optional
+        Fontsize of labels, by default 20
+
+    Returns
+    -------
+    fig : class
+        Matplotlib figure object
+    ax : class
+        Matplotlib axis object of the figure
+    '''    
     #Step the rays through the model to get the ray positions throughout the column
     rays = model.step()
 
@@ -338,8 +410,6 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, la
     ray_alpha = 1
 
     ray_lw = 0.25
-    edge_lw = edge_lw
-    component_lw = component_lw
 
     plot_rays = True
     highlight_edges = True

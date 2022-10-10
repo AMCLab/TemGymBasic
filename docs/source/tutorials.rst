@@ -152,3 +152,4 @@ to move accross the screen.
 This happens because the aperture is not centred on the optic axis. Adjust the position
 of the aperture so that it is centred on the column, and adjust the focal length once more. Notice that the beam
 only changes size, and does not move accross the screen. 
+
