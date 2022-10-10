@@ -1,15 +1,12 @@
-import sys
-sys.path.append(r"..")
-from components import Lens, DoubleDeflector, Sample
-from model import Model
-import numpy as np
-from run import show_matplotlib
+from temgymbasic import components as comp
+from temgymbasic.model import Model
+from temgymbasic.run import show_matplotlib
 
 
 #Showing Beam Shift Pivot Point
-components = [DoubleDeflector(name='Double Deflector', z_up=0.80, z_low=0.60, updefx=0.4, lowdefx=-0.4),
-              Sample(name='Sample', z=0.4),
-              Lens(name='Lens', z=0.20, f=-0.2),
+components = [comp.DoubleDeflector(name='Double Deflector', z_up=0.80, z_low=0.60, updefx=0.4, lowdefx=-0.4),
+              comp.Sample(name='Sample', z=0.4),
+              comp.Lens(name='Lens', z=0.20, f=-0.2),
               ]
 
 axis_view = 'x_axial'
@@ -21,9 +18,9 @@ fig.suptitle('Beam Shift', fontsize = 40)
 fig.savefig('beam_shift_basic.svg')
 
 #Showing Beam Tilt Pivot Point
-components = [DoubleDeflector(name='Double Deflector', z_up=0.80, z_low=0.60, updefx=0.4, lowdefx=-0.8),
-              Sample(name='Sample', z=0.4),
-              Lens(name='Lens', z=0.20, f=-0.2),
+components = [comp.DoubleDeflector(name='Double Deflector', z_up=0.80, z_low=0.60, updefx=0.4, lowdefx=-0.8),
+              comp.Sample(name='Sample', z=0.4),
+              comp.Lens(name='Lens', z=0.20, f=-0.2),
               ]
 
 axis_view = 'x_axial'

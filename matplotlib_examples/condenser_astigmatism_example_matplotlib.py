@@ -1,14 +1,10 @@
-import sys
-sys.path.append(r"..")
-from components import AstigmaticLens, Quadrupole
-from model import Model
-import numpy as np
-from run import show_matplotlib
-
+from temgymbasic import components as comp
+from temgymbasic.model import Model
+from temgymbasic.run import show_matplotlib
 
 components = [
-    AstigmaticLens(name='Condenser Lens', z=0.7, fx=-0.4, fy=-0.6),
-    Quadrupole(name='Condenser Stigmator', z=0.5)
+    comp.AstigmaticLens(name='Condenser Lens', z=0.7, fx=-0.4, fy=-0.6),
+    comp.Quadrupole(name='Condenser Stigmator', z=0.5)
 ]
 
 axis_view = 'x_axial'

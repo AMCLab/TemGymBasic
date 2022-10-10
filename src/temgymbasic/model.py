@@ -1,5 +1,4 @@
 
-
 import numpy as np
 from functions import circular_beam, point_beam, axial_point_beam, x_axial_point_beam
 from gui import ModelGui

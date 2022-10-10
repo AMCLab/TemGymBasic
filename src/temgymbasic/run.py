@@ -1,5 +1,4 @@
 from functools import partial
-import sys
 from functions import get_image_from_rays
 
 import PyQt5
@@ -7,7 +6,6 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QScrollArea
-from PyQt5.QtWidgets import QApplication
 
 import pyqtgraph.opengl as gl
 import pyqtgraph as pg

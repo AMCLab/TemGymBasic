@@ -1,16 +1,11 @@
-import sys
-from PyQt5.QtWidgets import QApplication
-sys.path.append(r"..")
-from components import  Biprism, Sample
-from model import Model
-import numpy as np
-from run import show_matplotlib
+from temgymbasic import components as comp
+from temgymbasic.model import Model
+from temgymbasic.run import show_matplotlib
 
-
-components = [Biprism(name = 'Condenser Biprism', z = 0.7, theta=np.pi/2, width = 0.01),
-              Sample(name = 'Sample', z = 0.5, width = 0.2, x = -0.1),
-              Biprism(name = 'Biprism 1', z = 0.4, theta=np.pi/2, width = 0.01),
-              Biprism(name = 'Biprism 2', z = 0.2, theta=np.pi/2, width = 0.01)]
+components = [comp.Biprism(name = 'Condenser Biprism', z = 0.7, theta=np.pi/2, width = 0.01),
+              comp.Sample(name = 'Sample', z = 0.5, width = 0.2, x = -0.1),
+              comp.Biprism(name = 'Biprism 1', z = 0.4, theta=np.pi/2, width = 0.01),
+              comp.Biprism(name = 'Biprism 2', z = 0.2, theta=np.pi/2, width = 0.01)]
 
 axis_view = 'x_axial'
 model_ = Model(components, beam_z=1.0, beam_type='x_axial',

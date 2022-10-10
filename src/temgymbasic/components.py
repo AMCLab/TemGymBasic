@@ -1,4 +1,3 @@
-
 import geometry as geom
 from gui import *
 import pyqtgraph.opengl as gl

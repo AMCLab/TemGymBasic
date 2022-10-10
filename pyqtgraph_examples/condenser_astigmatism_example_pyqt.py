@@ -1,14 +1,13 @@
-import sys
-from PyQt5.QtWidgets import QApplication
-sys.path.append(r"..")
-from components import AstigmaticLens, Quadrupole
-from model import Model
-from run import run_pyqt
+from temgymbasic import components as comp
+from temgymbasic.model import Model
+from temgymbasic.run import run_pyqt
+from pyqt5 import QApplication
+import sys 
 
 def main():
     components = [
-        AstigmaticLens(name='Condenser Lens', z=0.7, fx=-0.4, fy=-0.6),
-        Quadrupole(name='Condenser Stigmator', z=0.5)
+        comp.AstigmaticLens(name='Condenser Lens', z=0.7, fx=-0.4, fy=-0.6),
+        comp.Quadrupole(name='Condenser Stigmator', z=0.5)
     ]
     
     model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.03)

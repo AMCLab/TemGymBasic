@@ -1,12 +1,11 @@
-import sys
-from PyQt5.QtWidgets import QApplication
-sys.path.append(r"..")
-from components import Lens
-from model import Model
-from run import run_pyqt
+from temgymbasic import components as comp
+from temgymbasic.model import Model
+from temgymbasic.run import run_pyqt
+from pyqt5 import QApplication
+import sys 
 
 def main():
-    components = [Lens(name = 'Lens', z = 0.5, f = -0.5)]
+    components = [comp.Lens(name = 'Lens', z = 0.5, f = -0.5)]
     
     model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.15)
     run_pyqt(model_)    
