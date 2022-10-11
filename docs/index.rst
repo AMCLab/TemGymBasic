@@ -68,7 +68,7 @@ the GUI.
 
 which generates an interactive window on your PC. 
 
-.. image:: all_components_example.png
+.. image:: all_components_example.PNG
    :width: 500px
    :alt: project
 
