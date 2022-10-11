@@ -66,9 +66,10 @@ the GUI.
    :lines: 21-22
 
 which generates an interactive window on your PC. 
-
+.. image:: img/all_components_example.png
+.. image:: ./img/all_components_example.png
 .. image:: /img/all_components_example.png
-   :width: 500px
+.. image:: //img/all_components_example.png
 
 Contents
 --------
