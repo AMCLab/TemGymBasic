@@ -15,6 +15,6 @@ to me made to create a matplotlib diagram rather than in an interactive pyqtgrap
 
 which produces this model:
 
-.. image:: img/model_tem.svg
+.. image:: /img/model_tem.svg
    :width: 600px
 
