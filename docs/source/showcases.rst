@@ -11,7 +11,6 @@ version of the microscope setup presented in this paper from tonamura in 2012.
 
 .. image:: /img/biprism_model.png
    :width: 600px
-   :alt: project
 
 Model TEM
 ---------
