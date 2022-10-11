@@ -7,4 +7,4 @@ License
 .. license-info:: GPL-3.0
 
 .. license::
-    :file: ../LICENSE.md
+    :file: /../LICENSE.md
