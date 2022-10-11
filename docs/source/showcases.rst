@@ -9,7 +9,7 @@ Biprism
 We can combine three biprism components created in our software to make an interactive
 version of the microscope setup presented in this paper from tonamura in 2012.
 
-.. image:: img/biprism_model.png
+.. image:: biprism_model.png
    :width: 600px
    :alt: project
 
@@ -22,7 +22,7 @@ The code which creates this model is located in the python script ''model_tem_ex
 .. literalinclude:: ../../pyqtgraph_examples/model_tem_example_pyqt.py
    :language: python
 
-.. image:: img/model_tem_example.png
+.. image:: model_tem_example.png
    :width: 600px
    :alt: project
 
@@ -34,6 +34,6 @@ showing how the beam inside a scanning electron microscope operates.
 .. literalinclude:: ../../pyqtgraph_examples/model_sem_example_pyqt.py
    :language: python
 
-.. image:: img/model_sem_example.png
+.. image:: model_sem_example.png
    :width: 600px
    :alt: project
