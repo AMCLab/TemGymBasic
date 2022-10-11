@@ -12,7 +12,6 @@ components inside a transmission electron microscope.
 
 .. image:: source/img/GUI_graphic.svg
    :width: 900px
-   :alt: project
 
 The interactive models we generate are designed with a focus
 on educating new users on how the basic alignments work inside a TEM. 
@@ -68,9 +67,8 @@ the GUI.
 
 which generates an interactive window on your PC. 
 
-.. image:: source/img/all_components_example.PNG
+.. image:: source/img/all_components_example.png
    :width: 500px
-   :alt: project
 
 Contents
 --------

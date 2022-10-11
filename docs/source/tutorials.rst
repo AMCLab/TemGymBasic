@@ -10,7 +10,6 @@ The important gui components are annotated in the image below.
 
 .. image:: img/simple_lens_annotated.png
    :width: 600px
-   :alt: project
 
 
 With this basic model, we can demonstrate
@@ -27,7 +26,6 @@ Tilt the beam off axis and turn on the lens wobble by ticking the check box "Wob
 
 .. figure:: img/simple_lens_wobble_on.png
    :width: 600px
-   :alt: project
 
    Rotation centre is misaligned, as the beam is away from the optic axis.
 
@@ -39,7 +37,6 @@ by adjusting the tilt of the beam. When the beam spot stops moving, the rotation
 
 .. figure:: img/simple_lens_aligned.png
    :width: 600px
-   :alt: project
 
    Rotation centre aligned.
 
