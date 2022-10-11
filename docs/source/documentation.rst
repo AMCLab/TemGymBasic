@@ -1,21 +1,21 @@
 =============
 Documentation
 =============
-.. automodule:: /../../src/temgymbasic/functions
+.. automodule:: temgymbasic/functions
     :members:
-    :special-members:
-.. automodule:: /../../src/temgymbasic/components
+    :special-members: __init__
+.. automodule:: temgymbasic/components
     :members:
-    :special-members:
-.. automodule:: /../../src/temgymbasic/geometry
+    :special-members: __init__
+.. automodule:: temgymbasic/geometry
     :members:
-    :special-members:
-.. automodule:: /../../src/temgymbasic/gui
+    :special-members: __init__
+.. automodule:: temgymbasic/gui
     :members:
-    :special-members:
-.. automodule:: /../../src/temgymbasic/model
+    :special-members: __init__
+.. automodule:: temgymbasic/model
     :members:
-    :special-members:
-.. automodule:: /../../src/temgymbasic/run
+    :special-members: __init__
+.. automodule:: temgymbasic/run
     :members:
-    :special-members:
+    :special-members: __init__
