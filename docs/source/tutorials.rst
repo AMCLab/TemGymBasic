@@ -85,7 +85,6 @@ Run the basic Beam Shift/Tilt model and click the "Wobble Upper Deflector X" che
 
 .. image:: /source/img/beam_tilt_shift_wobble_circled.png
    :width: 500px
-   :alt: project
 
 Set the deflector ratio to -1 and see that the spot on the detector is now stationary.
 You have correctly aligned the beam shift pivot point.
@@ -107,7 +106,6 @@ quadrupole magnets which when the current to each is adjusted, can correct for a
 
 .. figure:: /source/img/condenser_asigmatism_base.png
    :width: 500px
-   :alt: project
 
    Elliptical beam indicates condenser asigmatism is misaligned
 
@@ -121,7 +119,6 @@ appear round again.
 
 .. figure:: /source/img/condenser_asigmatism_corrected.png
    :width: 500px
-   :alt: project
 
    Circular beam means we have corrected the condenser astigmatism
 
@@ -133,7 +130,6 @@ and adjust the strength of the condenser lens focal length.
 
 .. figure:: /source/img/condenser_aperture_before_lens_adjust.png
    :width: 500px
-   :alt: project
 
    Beamspot position before adjusting focal length. 
 
@@ -142,7 +138,6 @@ to move accross the screen.
 
 .. figure:: /source/img/condenser_aperture_after_lens_adjust.png
    :width: 500px
-   :alt: project
 
    Beamspot position after adjusting focal length. 
 
