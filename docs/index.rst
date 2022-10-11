@@ -67,8 +67,11 @@ the GUI.
 
 which generates an interactive window on your PC. 
 .. image:: img/all_components_example.png
+
 .. image:: ./img/all_components_example.png
+
 .. image:: /img/all_components_example.png
+   
 .. image:: //img/all_components_example.png
 
 Contents
