@@ -10,7 +10,7 @@ TemGym Basic
 TemGym Basic is a ray-tracing software that models and visualises the first order behaviour of 
 components inside a transmission electron microscope.
 
-.. image:: /source/img/GUI_graphic.svg
+.. image:: /img/GUI_graphic.svg
    :width: 900px
 
 The interactive models we generate are designed with a focus
@@ -67,7 +67,7 @@ the GUI.
 
 which generates an interactive window on your PC. 
 
-.. image:: /source/img/all_components_example.png
+.. image:: /img/all_components_example.png
    :width: 500px
 
 Contents
