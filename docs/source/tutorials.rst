@@ -8,7 +8,7 @@ Let's begin with the simplest model our programme can produce: A beam, a single 
 Run the model "Simple Lens" (via the .exe, or the python script), and become familiar with the interface. 
 The important gui components are annotated in the image below.
 
-.. image:: img/simple_lens_annotated.png
+.. image:: /source/img/simple_lens_annotated.png
    :width: 600px
 
 
@@ -24,7 +24,7 @@ can recreate the behaviour of this alignment.
 
 Tilt the beam off axis and turn on the lens wobble by ticking the check box "Wobble Lens Current".
 
-.. figure:: img/simple_lens_wobble_on.png
+.. figure:: /source/img/simple_lens_wobble_on.png
    :width: 600px
 
    Rotation centre is misaligned, as the beam is away from the optic axis.
@@ -35,7 +35,7 @@ by tilting the beam so that the spot no longer moves, and so that it only contra
 focal length changes. Bring the beam back onto the centre of the lens and thus paralell to the optic axis 
 by adjusting the tilt of the beam. When the beam spot stops moving, the rotation centre is now aligned.
 
-.. figure:: img/simple_lens_aligned.png
+.. figure:: /source/img/simple_lens_aligned.png
    :width: 600px
 
    Rotation centre aligned.
@@ -61,10 +61,10 @@ location and focal length of a lens after it.
 
 |pic1| |pic2|
 
-.. |pic1| image:: img/beam_shift_basic.svg
+.. |pic1| image:: /source/img/beam_shift_basic.svg
    :width: 45%
    :class: with-border
-.. |pic2| image:: img/beam_tilt_basic.svg
+.. |pic2| image:: /source/img/beam_tilt_basic.svg
    :class: with-border
    :width: 45%
 
@@ -83,7 +83,7 @@ Beam Shift Alignment
 ^^^^^^^^^^^^^^^^^^^^
 Run the basic Beam Shift/Tilt model and click the "Wobble Upper Deflector X" checkbox. 
 
-.. image:: img/beam_tilt_shift_wobble_circled.png
+.. image:: /source/img/beam_tilt_shift_wobble_circled.png
    :width: 500px
    :alt: project
 
@@ -105,7 +105,7 @@ manufactured to be perfectly circular, and will thus have two different focal le
 on each axis. The component which is used to correct for this is a stigmator. This is composed of two 
 quadrupole magnets which when the current to each is adjusted, can correct for astigmatism in a lens.
 
-.. figure:: img/condenser_asigmatism_base.png
+.. figure:: /source/img/condenser_asigmatism_base.png
    :width: 500px
    :alt: project
 
@@ -119,7 +119,7 @@ you as a user would not have control of the astigmatism of the lens!
 Use the condenser astigmatism sliders to correct for the astigmatism in the lens by making the beam 
 appear round again.
 
-.. figure:: img/condenser_asigmatism_corrected.png
+.. figure:: /source/img/condenser_asigmatism_corrected.png
    :width: 500px
    :alt: project
 
@@ -131,7 +131,7 @@ Similar to almost every other alignment in the microscope,
 this alignment requires that the aperture is centred on the optic axis. Run the alignment "Condenser Aperture",
 and adjust the strength of the condenser lens focal length. 
 
-.. figure:: img/condenser_aperture_before_lens_adjust.png
+.. figure:: /source/img/condenser_aperture_before_lens_adjust.png
    :width: 500px
    :alt: project
 
@@ -140,7 +140,7 @@ and adjust the strength of the condenser lens focal length.
 Notice how as you do this, the beam spot appears 
 to move accross the screen. 
 
-.. figure:: img/condenser_aperture_after_lens_adjust.png
+.. figure:: /source/img/condenser_aperture_after_lens_adjust.png
    :width: 500px
    :alt: project
 
