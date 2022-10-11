@@ -36,4 +36,3 @@ showing how the beam inside a scanning electron microscope operates.
 
 .. image:: /source/img/model_sem_example.png
    :width: 600px
-   :alt: project
