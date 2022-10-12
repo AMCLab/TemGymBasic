@@ -18,11 +18,18 @@ def main():
     model_ = Model(components, beam_z=1.5, beam_type='point',
                 num_rays=32, beam_semi_angle=0.03)
     
-    run_pyqt(model_)
+    viewer = run_pyqt(model_)   
+    
+    return viewer 
 
-#Run Pyqtgraph Interface
 if __name__ == '__main__':
+    
     AppWindow = QApplication(sys.argv)
-    main()
-    sys.exit(AppWindow.exec_())
+    
+    viewer = main()
+    
+    #Show the viewer
+    viewer.show()
+    
+    AppWindow.exec_()
         

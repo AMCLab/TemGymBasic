@@ -41,7 +41,6 @@ class MainWindow(QWidget):
 
     def runfile(self, file):
         file.main()
-        
+
 AppWindow = QApplication(sys.argv)
 mainapp = MainWindow()
-sys.exit(AppWindow.exec_())

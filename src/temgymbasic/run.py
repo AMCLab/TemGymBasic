@@ -338,9 +338,8 @@ def run_pyqt(model):
     
     #Connect the model with the viewer
     LinearTEMCtrl(model, viewer)
-    
-    #Show the viewer
-    viewer.show()
+
+    return viewer
     
 #Example code to make a matplotlib plot
 def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, label_fontsize = 20):

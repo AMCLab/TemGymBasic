@@ -14,9 +14,17 @@ def main():
     model_ = Model(components, beam_z = 0.6, beam_type = 'paralell', num_rays = 128)
     
     
-    run_pyqt(model_)
-        
+    viewer = run_pyqt(model_)   
+    
+    return viewer 
+
 if __name__ == '__main__':
+    
     AppWindow = QApplication(sys.argv)
-    main()
-    sys.exit(AppWindow.exec_())
+    
+    viewer = main()
+    
+    #Show the viewer
+    viewer.show()
+    
+    AppWindow.exec_()

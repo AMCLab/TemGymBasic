@@ -1,4 +1,4 @@
-import temgymbasic.geometry as geom
+import temgymbasic.shapes as geom
 from temgymbasic.gui import *
 import pyqtgraph.opengl as gl
 import numpy as np

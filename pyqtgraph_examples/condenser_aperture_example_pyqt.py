@@ -9,9 +9,18 @@ def main():
                   comp.Lens(name = 'Condenser Lens', z = 0.2, f = -0.5)]
     
     model_ = Model(components, beam_z = 0.8, beam_type = 'point', num_rays = 1024, beam_semi_angle = 0.21)
-    run_pyqt(model_)
     
+    viewer = run_pyqt(model_)   
+    
+    return viewer 
+
 if __name__ == '__main__':
+    
     AppWindow = QApplication(sys.argv)
-    main()
-    sys.exit(AppWindow.exec_())
+    
+    viewer = main()
+    
+    #Show the viewer
+    viewer.show()
+    
+    AppWindow.exec_()

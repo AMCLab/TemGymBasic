@@ -1,3 +1,6 @@
+import os
+os.chdir(r'G:\\My Drive\\Davids Research\\LinearTEM\\LINEARTEMGYM-master_\\LINEARTEMGYM-master\temgym\\src')
+
 from temgymbasic import components as comp
 from temgymbasic.model import Model
 from temgymbasic.run import run_pyqt
@@ -11,11 +14,20 @@ def main():
                   comp.Biprism(name = 'Biprism 2', z = 0.2)]
 
     model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 4096, beam_semi_angle = 0.1)
-    run_pyqt(model_)
+    
+    viewer = run_pyqt(model_)   
+    
+    return viewer 
 
 if __name__ == '__main__':
+    
     AppWindow = QApplication(sys.argv)
-    main()
-    sys.exit(AppWindow.exec_())
+    
+    viewer = main()
+    
+    #Show the viewer
+    viewer.show()
+    
+    AppWindow.exec_()
 
 
