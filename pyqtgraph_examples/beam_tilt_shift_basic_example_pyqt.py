@@ -13,18 +13,13 @@ def main():
     #Generate Model
     model_ = Model(components, beam_z = 0.6, beam_type = 'paralell', num_rays = 128)
     
+    viewer = run_pyqt(model_)  
     
-    viewer = run_pyqt(model_)   
-    
-    return viewer 
+    return viewer
 
 if __name__ == '__main__':
     
     AppWindow = QApplication(sys.argv)
-    
-    viewer = main()
-    
-    #Show the viewer
+    viewer = main()    
     viewer.show()
-    
     AppWindow.exec_()

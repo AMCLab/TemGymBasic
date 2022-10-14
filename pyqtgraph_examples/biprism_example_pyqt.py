@@ -1,5 +1,3 @@
-import os
-os.chdir(r'G:\\My Drive\\Davids Research\\LinearTEM\\LINEARTEMGYM-master_\\LINEARTEMGYM-master\temgym\\src')
 
 from temgymbasic import components as comp
 from temgymbasic.model import Model
@@ -15,19 +13,16 @@ def main():
 
     model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 4096, beam_semi_angle = 0.1)
     
-    viewer = run_pyqt(model_)   
+    viewer = run_pyqt(model_)  
+    
+    viewer.show()
     
     return viewer 
 
 if __name__ == '__main__':
     
     AppWindow = QApplication(sys.argv)
-    
-    viewer = main()
-    
-    #Show the viewer
+    viewer = main()    
     viewer.show()
-    
     AppWindow.exec_()
-
 

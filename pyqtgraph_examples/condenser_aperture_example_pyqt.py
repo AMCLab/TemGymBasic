@@ -10,17 +10,13 @@ def main():
     
     model_ = Model(components, beam_z = 0.8, beam_type = 'point', num_rays = 1024, beam_semi_angle = 0.21)
     
-    viewer = run_pyqt(model_)   
+    viewer = run_pyqt(model_)  
     
     return viewer 
 
 if __name__ == '__main__':
     
     AppWindow = QApplication(sys.argv)
-    
-    viewer = main()
-    
-    #Show the viewer
-    viewer.show()
-    
+    viewer = main()   
+    viewer.show() 
     AppWindow.exec_()
