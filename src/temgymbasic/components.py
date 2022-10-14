@@ -723,7 +723,7 @@ class Biprism():
     parameters. Important to note that the transfer matrix of the biprism is only cosmetic: It still
     need to be multiplied by the sign of the position of the ray to perform like a biprism. 
     '''    
-    def __init__(self, z, name = '', deflection = 0.5, theta = 0., label_radius = 0.3, radius = 0.25, width = 0.01, num_points = 50):
+    def __init__(self, z, name = '', deflection = 0.5, theta = 0, label_radius = 0.3, radius = 0.25, width = 0.01, num_points = 50):
         '''
 
         Parameters
@@ -734,8 +734,8 @@ class Biprism():
             Name of this component which will be displayed by GUI, by default ''
         deflection : float, optional
             Biprism deflection kick in slope units to the incoming ray angle, by default 0.5
-        theta : float, optional
-            Angle of the biprism - Two options - 0 or np.pi/2, by default 0
+        theta: int, optional
+            Angle of the biprism - Two options - 0 or 1. 0 for 0 degree rotation, 1 for 90 degree rotation, by default 0
         label_radius : float, optional
             Location to place the label in the 3D GUI, by default 0.3
         radius : float, optional

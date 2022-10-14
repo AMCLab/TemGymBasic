@@ -4,8 +4,8 @@ Example Alignments
 
 Lens & Rotation Centre Alignment
 --------------------------------
-Let's begin with the simplest model our programme can produce: A beam, a single lens and a detector. 
-Run the model "Simple Lens" (via the .exe, or the python script), and become familiar with the interface. 
+Let's begin with a tutorial using the simplest model our programme can produce: A beam, a single lens and a detector. 
+Run the model "lens_example_pyqt" (via the `.exe <https://zenodo.org/communities/amcl/?page=1&size=20`_ , or the `python script <https://github.com/AMCLab/TemGymBasic/blob/main/pyqtgraph_examples/lens_example_pyqt.py`_), and become familiar with the interface. 
 The important gui components are annotated in the image below.
 
 .. image:: /img/simple_lens_annotated.png

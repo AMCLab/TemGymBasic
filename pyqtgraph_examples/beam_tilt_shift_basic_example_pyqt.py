@@ -15,11 +15,11 @@ def main():
     
     viewer = run_pyqt(model_)  
     
-    return viewer
+    return viewer 
 
 if __name__ == '__main__':
     
     AppWindow = QApplication(sys.argv)
-    viewer = main()    
-    viewer.show()
+    viewer = main()   
+    viewer.show() 
     AppWindow.exec_()

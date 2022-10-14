@@ -3,10 +3,6 @@ from PyQt5.QtWidgets import QApplication
 from temgymbasic.run import run_pyqt
 from temgymbasic.model import Model
 from temgymbasic import components as comp
-import os
-os.chdir(r'G:\\My Drive\\Davids Research\\LinearTEM\\LINEARTEMGYM-master_\\LINEARTEMGYM-master\temgym\\src')
-
-
 def main():
     components = [comp.Lens(name='Electrostatic Lens', z=3, f=-0.2),
                   comp.DoubleDeflector(name='Gun Beam Deflectors',
@@ -39,18 +35,13 @@ def main():
     model_ = Model(components, beam_z=3.5, beam_type='point',
                    num_rays=256, beam_semi_angle=0.25)
 
-    viewer = run_pyqt(model_)
+    viewer = run_pyqt(model_)  
 
-    return viewer
-
+    return viewer 
 
 if __name__ == '__main__':
-
+    
     AppWindow = QApplication(sys.argv)
-
-    viewer = main()
-
-    #Show the viewer
+    viewer = main()    
     viewer.show()
-
     AppWindow.exec_()

@@ -85,7 +85,7 @@ class LinearTEMUi(QMainWindow):
         self.create3DDisplay()
         self.createDetectorDisplay()
         self.createGUI()
-
+        
     def create3DDisplay(self):
         '''Create the 3D Display
         '''        

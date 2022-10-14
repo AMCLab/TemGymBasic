@@ -7,7 +7,7 @@ Documentation
 .. automodule:: temgymbasic.components
     :members:
     :special-members: __init__
-.. automodule:: temgymbasic.geometry
+.. automodule:: temgymbasic.shapes
     :members:
     :special-members: __init__
 .. automodule:: temgymbasic.gui

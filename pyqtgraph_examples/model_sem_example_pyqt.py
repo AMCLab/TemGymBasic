@@ -4,7 +4,6 @@ from temgymbasic.run import run_pyqt
 from PyQt5.QtWidgets import QApplication
 import sys 
 
-
 def main():
     components = [comp.Lens(name = '1st Condenser Lens', z = 1.5, f = -0.1),
                   comp.Aperture(name = 'Spray Aperture', z = 1.2, aperture_radius_inner = 0.05),
@@ -27,8 +26,5 @@ if __name__ == '__main__':
     AppWindow = QApplication(sys.argv)
     
     viewer = main()
-    
-    #Show the viewer
     viewer.show()
-    
     AppWindow.exec_()

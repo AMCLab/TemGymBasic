@@ -11,6 +11,8 @@ import model_tem_example_pyqt
 import condenser_astigmatism_example_pyqt
 import biprism_example_pyqt
 
+# sys.path.insert(1, r"G:\My Drive\Davids Research\LinearTEM\LINEARTEMGYM-master_\LINEARTEMGYM-master\temgym\src")
+
 examples = OrderedDict([
     ('Basic Beam Tilt/Shift', beam_tilt_shift_basic_example_pyqt),
     ('Advanced Beam Tilt/Shift', beam_tilt_shift_advanced_example_pyqt),
@@ -27,10 +29,11 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         
+        self.viewer = None
+        
         #make the GUI layout
         self.layout = QVBoxLayout(self)
         self.createbuttons()
-        self.show()
 
     def createbuttons(self):
         #loop through list of example items, and connect them to a button.
@@ -40,7 +43,18 @@ class MainWindow(QWidget):
             self.layout.addWidget(button)
 
     def runfile(self, file):
-        file.main()
+        if self.viewer is None:
+            self.viewer = file.main()
+            self.viewer.show()
+        else:
+            self.viewer.close()  # Close windoviewer.
+            self.viewer = None  # Discard reference.
+    
 
-AppWindow = QApplication(sys.argv)
-mainapp = MainWindow()
+if __name__ == "__main__":
+    mainapp = MainWindow()
+    mainapp.show()
+
+    
+    
+    

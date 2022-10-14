@@ -4,16 +4,16 @@ build-backend = "hatchling.build"
 
 [project]
 name = "temgymbasic"
-version = "0.5.6"
+version = "0.5.9"
 authors = [
   { name="David Landers", email="davidlanders2009@hotmail.com" },
 ]
 description = "A educational TEM ray tracing matrix package"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = "3.9.6"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GPL3 License",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
 ]
 dependencies = [

@@ -385,9 +385,9 @@ class BiprismGui():
             Name of component
         deflection : float
             Deflection angle in Slope units
-        theta : float
+        theta : int
             Angle of biprism. Determines if the biprism creates deflects in the x or y direction.
-            Two options: 0 or np.pi/2
+            Two options: 0 or 1. 0 for 0 degrees, 1 for 90 degree rotation. 
 
         '''
         self.box = QGroupBox(name)
