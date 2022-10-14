@@ -5,6 +5,7 @@ from temgymbasic.gui import ModelGui
 
 '''This class create the model composed of the specified components, and handles all of the computation
 that transmits the rays through each component.'''
+
 class Model():
     '''Generates a model electron microscope. This class generates performs the matrix 
     multiplication and function updates to calculate their positions throughout
@@ -14,7 +15,6 @@ class Model():
                  beam_semi_angle=np.pi/4, beam_tilt_x=0, beam_tilt_y=0, beam_width = 0.2,
                  detector_size = 0.5, detector_pixels = 128):
         '''
-
         Parameters
         ----------
         components : list

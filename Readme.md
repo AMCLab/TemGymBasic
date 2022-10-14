@@ -1,5 +1,4 @@
-# Example Package
+# Tem Gym Basic
 
-This is a simple example package. You can use
-[Github-flavored Markdown](https://guides.github.com/features/mastering-markdown/)
-to write your content.
+An interactive first order ray tracing software for electron microscopes written in python.
+See [documentation](https://temgymbasic.readthedocs.io/en/latest/) on readthedocs for more info. 

@@ -34,6 +34,16 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx_licenseinfo']
 
+html_context = {
+    "sidebar_external_links_caption": "Links",
+    "sidebar_external_links": [
+        (
+            '<i class="fa fa-github fa-fw"></i> Source code',
+            "https://github.com/AMCLab/TemGymBasic",
+        ),
+    ],
+}
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -54,6 +64,8 @@ master_doc = 'index'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+
+napoleon_numpy_docstring = True
 
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'

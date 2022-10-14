@@ -87,10 +87,11 @@ Contents
    source/matplotlib
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Reference
 
    source/documentation
+   source/bibliography
    source/license
 
 

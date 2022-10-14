@@ -9,21 +9,32 @@ instantly access example models of microscope alignments without any coding know
 
 Python
 ------
-To run our interactive models via python, we recommend you use  `miniconda <https://docs.conda.io/en/latest/miniconda.html>`_.
+To run our interactive models via python, we recommend you use  `miniconda <https://docs.conda.io/en/latest/miniconda.html>`_ .
 
-After downloading and installing, create a new environment in a terminal.
+After downloading and installing, create a new environment in a terminal::
 
     $ conda create --name temgymbasic python=3.9.6
 
-activate the environment, and install pip
+activate the environment, and install pip::
 
     $ conda activate temgymbasic
+
     $ conda install pip
 
-then install `temgymbasic <https://pypi.org/project/temgymbasic/`_
+then install `temgymbasic <https://pypi.org/project/temgymbasic/>`_::
 
     $ pip install temgymbasic
 
-To download and run the python code of examples, see our `GitHub <https://github.com/AMCLab/TemGymBasic`_ and the folder `pyqtgraph_examples <https://github.com/AMCLab/TemGymBasic/pyqtgraph_examples`_.
+To download and run the python code of examples, see our `GitHub <https://github.com/AMCLab/TemGymBasic>`_ and the folder `pyqtgraph_examples <https://github.com/AMCLab/TemGymBasic/tree/main/pyqtgraph_examples>`_.
 
-Toshiaki Tanigaki, Yoshikatsu Inada, Shinji Aizawa, Takahiro Suzuki, Hyun Soon Park, Tsuyoshi Matsuda, Akira Taniyama, Daisuke Shindo, and Akira Tonomura , "Split-illumination electron holography", Appl. Phys. Lett. 101, 043101 (2012) https://doi.org/10.1063/1.4737152
+Creating Executables
+--------------------
+
+To create the .exe files that we have shared in the zenodo,
+install the package pyinstaller inside your temgymbasic environment::
+
+    $ pip install pyinstaller
+
+then run the appropiate terminal script, make_exe.bat (Windows) or make_exe.sh (Linux, MACOS). 
+This process may take some time to create the executables for all 9 examples (~30 minutes)
+
