@@ -34,6 +34,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx_licenseinfo']
 
+templates_path = ["_templates"]
 html_context = {
     "sidebar_external_links_caption": "Links",
     "sidebar_external_links": [
@@ -41,6 +42,10 @@ html_context = {
             '<i class="fa fa-github fa-fw"></i> Source code',
             "https://github.com/AMCLab/TemGymBasic",
         ),
+        (
+            '<i class="fa fa-download fa-fw"></i> Zenodo',
+            "https://zenodo.org/communities/amcl/?page=1&size=20",
+        )
     ],
 }
 
