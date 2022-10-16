@@ -11,7 +11,7 @@ to me made to create a matplotlib diagram rather than in an interactive pyqtgrap
 
 .. literalinclude:: /../matplotlib_examples/model_tem_example_matplotlib.py
    :language: python
-   :emphasize-lines: 5,31-34
+   :emphasize-lines: 31-34
 
 which produces this model:
 
