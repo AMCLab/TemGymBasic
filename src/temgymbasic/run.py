@@ -331,7 +331,6 @@ class LinearTEMCtrl:
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()
-        print(os.getcwd())
         loadUi("splash.ui", self)
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
     
