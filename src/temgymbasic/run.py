@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QScrollArea
+from PyQt5.QtWidgets import QSplashScreen
+from PyQt5.uic import loadUi
 
 import pyqtgraph.opengl as gl
 import pyqtgraph as pg
@@ -15,6 +17,8 @@ from pyqtgraph.dockarea import Dock, DockArea
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+
+import time
 
 mpl.rcParams['font.family'] = 'Helvetica'
 mpl.rc('axes', titlesize=32, labelsize=28)
@@ -324,6 +328,15 @@ class LinearTEMCtrl:
 
         self.view.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
 
+class SplashScreen(QSplashScreen):
+    def __init__(self):
+        super(QSplashScreen, self).__init__()
+        print(os.getcwd())
+        loadUi("splash.ui", self)
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+    
+    def sleep(self):
+        time.sleep(3)
 
 def run_pyqt(model):
     '''Main code to run a pyqt model
@@ -334,10 +347,16 @@ def run_pyqt(model):
         Microscope Model
     '''    
     #Generate the GUI
+    splash = SplashScreen()
+    splash.show()
+    splash.sleep()
+
     viewer = LinearTEMUi(model)
     
     #Connect the model with the viewer
     LinearTEMCtrl(model, viewer)
+    
+    splash.close()
 
     return viewer
     
@@ -601,5 +620,4 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, la
     ax.plot([-model.detector_size/2, model.detector_size/2],
             [0, 0], color='dimgrey', alpha=1, linewidth=component_lw)
     
-
     return fig, ax

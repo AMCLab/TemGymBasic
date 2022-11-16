@@ -23,7 +23,7 @@ dependencies = [
   'triangle',
   'PyQt5==5.15.2',
   'matplotlib==3.6.1'
-]
+] 
 
 [project.urls]
 "Homepage" = "https://github.com/AMCLab/TemGymBasic"
