@@ -7,7 +7,9 @@ from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QScrollArea
 from PyQt5.QtWidgets import QSplashScreen
-from PyQt5.uic import loadUi
+from PyQt5.QtWidgets import QDesktopWidget
+
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 import pyqtgraph.opengl as gl
 import pyqtgraph as pg
@@ -23,8 +25,9 @@ import time
 mpl.rcParams['font.family'] = 'Helvetica'
 mpl.rc('axes', titlesize=32, labelsize=28)
 
-__version__ = "0.5"
+__version__ = "0.5.9.2"
 __author__ = "David Landers"
+
 
 #Create the UI class
 class LinearTEMUi(QMainWindow):
@@ -327,13 +330,37 @@ class LinearTEMCtrl:
         self.view.spot_img.setImage(detector_image.T)
 
         self.view.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
+class Ui_splashui(object):
+    def setupUi(self, splashui):
+        splashui.setObjectName("splashui")
+        splashui.resize(747, 327)
+        splashui.setStyleSheet("")
+        self.label = QtWidgets.QLabel(splashui)
+        self.label.setGeometry(QtCore.QRect(40, 30, 661, 261))
+        self.label.setObjectName("label")
 
+        self.retranslateUi(splashui)
+        QtCore.QMetaObject.connectSlotsByName(splashui)
+
+    def retranslateUi(self, splashui):
+        _translate = QtCore.QCoreApplication.translate
+        splashui.setWindowTitle(_translate("splashui", "Form"))
+        self.label.setText(_translate("splashui", "<html><head/><body><p align=\"center\"><span style=\" font-size:18pt; font-weight:600; color:#0089cd;\">TemGym</span><span style=\" font-size:18pt; font-weight:600; color:#009100;\">Basic</span></p><p align=\"center\"><span style=\" font-size:12pt;\">Created By David Landers, Dr. Andy Stewart, Dr. Ian Clancy, </span></p><p align=\"center\"><span style=\" font-size:12pt;\">Dr. Dieter Weber, Prof. Rafal Dunin-Borkowski.</span></p><p align=\"center\"><span style=\" font-size:12pt;\">Automated Microscopy &amp; Crystallography Lab</span></p><p align=\"center\"><span style=\" font-size:12pt;\">DOI - Coming Soon</span></p></body></html>"))
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()
-        loadUi("splash.ui", self)
-        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
     
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.splash = Ui_splashui()
+        self.splash.setupUi(self)
+        self.center()
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
     def sleep(self):
         time.sleep(3)
 
@@ -348,13 +375,13 @@ def run_pyqt(model):
     #Generate the GUI
     splash = SplashScreen()
     splash.show()
-    splash.sleep()
-
+    
     viewer = LinearTEMUi(model)
     
     #Connect the model with the viewer
     LinearTEMCtrl(model, viewer)
     
+    splash.sleep()
     splash.close()
 
     return viewer
