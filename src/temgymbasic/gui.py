@@ -52,8 +52,19 @@ class LensGui():
             vbox.addStretch()
 
             self.box.setLayout(vbox)
+            
+            self.table = QGroupBox(name)
+            self.flabel_table = QLabel('Focal Length = ' + "{:.2f}".format(f))
+            self.flabel_table.setMinimumWidth(80)
+            hbox = QHBoxLayout()
+            hbox_labels = QHBoxLayout()
+            hbox_labels.addWidget(self.flabel_table)
 
-
+            vbox = QVBoxLayout()
+            vbox.addLayout(hbox_labels)
+            vbox.addLayout(hbox)
+            self.table.setLayout(vbox)
+            
 class AstigmaticLensGui():
     '''Gui for the Astigmatic Lens component
     '''    
@@ -113,6 +124,21 @@ class AstigmaticLensGui():
         vbox.addStretch()
 
         self.box.setLayout(vbox)
+        
+        self.table = QGroupBox(name)
+        self.fxlabel_table = QLabel(gui_label + 'X = ' + "{:.2f}".format(fy))
+        self.fxlabel_table.setMinimumWidth(80)
+        self.fylabel_table = QLabel(gui_label + 'Y = ' + "{:.2f}".format(fy))
+        self.fylabel_table.setMinimumWidth(80)
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.fxlabel_table)
+        hbox_labels.addWidget(self.fylabel_table)
+        
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        self.table.setLayout(vbox)
 
 
 class SampleGui():
@@ -158,7 +184,7 @@ class SampleGui():
         self.yslider.setValue(int(round(y)))
         self.yslider.setTickPosition(QSlider.TicksBelow)
 
-        self.ylabel = QLabel('y Position = ' + "{:.2f}".format(y))
+        self.ylabel = QLabel('Y Position = ' + "{:.2f}".format(y))
         self.ylabel.setMinimumWidth(80)
 
         hbox = QHBoxLayout()
@@ -172,7 +198,24 @@ class SampleGui():
         vbox.addStretch()
 
         self.box.setLayout(vbox)
+        
+        self.table = QGroupBox(name)
+        self.xlabel_table = QLabel('X Position = ' + "{:.2f}".format(x))
+        self.xlabel_table.setMinimumWidth(80)
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.xlabel_table)
+        
+        self.ylabel_table = QLabel('Y Position = ' + "{:.2f}".format(y))
+        self.ylabel_table.setMinimumWidth(80)
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.ylabel_table)
 
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        self.table.setLayout(vbox)
 
 class DeflectorGui():
     '''GUI for the deflector component
@@ -230,6 +273,21 @@ class DeflectorGui():
         vbox.addStretch()
 
         self.box.setLayout(vbox)
+        
+        self.table = QGroupBox(name)
+        self.defxlabel_table = QLabel('X Deflection = ' + "{:.2f}".format(defx))
+        self.defxlabel_table.setMinimumWidth(80)
+        self.defylabel_table = QLabel('Y Deflection = ' + "{:.2f}".format(defy))
+        self.defylabel_table.setMinimumWidth(80)
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.defxlabel_table)
+        hbox_labels.addWidget(self.defylabel_table)
+        
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        self.table.setLayout(vbox)
 
 
 class DoubleDeflectorGui():
@@ -332,8 +390,7 @@ class DoubleDeflectorGui():
         vbox.addSpacing(20)
 
         self.xbuttonwobble = QCheckBox("Wobble Upper Deflector X")
-        self.defratioxlabel = QLabel(
-            'Deflector X Response Ratio = ' + "{:.2f}".format(0))
+        self.defratioxlabel = QLabel('Deflector X Response Ratio = ' + "{:.2f}".format(0))
         self.defratioxslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.defratioxslider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.defratioxslider.setMinimum(-3000)
@@ -371,6 +428,28 @@ class DoubleDeflectorGui():
         vbox.addStretch()
 
         self.box.setLayout(vbox)
+        
+        self.table = QGroupBox(name)
+        self.defratioxlabel_table = QLabel('Deflector X Response Ratio = ' + "{:.2f}".format(0))
+        self.defratioylabel_table = QLabel('Deflector Y Response Ratio = ' + "{:.2f}".format(0))
+        self.lowdefxlabel_table = QLabel('X Deflection = ' + "{:.2f}".format(lowdefx))
+        self.lowdefylabel_table = QLabel('Y Deflection = ' + "{:.2f}".format(lowdefy))
+        self.updefxlabel_table = QLabel('X Deflection = ' + "{:.2f}".format(updefx))
+        self.updefylabel_table = QLabel('Y Deflection = ' + "{:.2f}".format(updefy))
+        
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.updefxlabel_table)
+        hbox_labels.addWidget(self.updefylabel_table)
+        hbox_labels.addWidget(self.lowdefxlabel_table)
+        hbox_labels.addWidget(self.lowdefylabel_table)
+        hbox_labels.addWidget(self.defratioxlabel_table)
+        hbox_labels.addWidget(self.defratioylabel_table)
+
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        self.table.setLayout(vbox)
 
 
 class BiprismGui():
@@ -433,6 +512,22 @@ class BiprismGui():
         vbox.addStretch()
 
         self.box.setLayout(vbox)
+        
+        self.table = QGroupBox(name)
+        self.deflabel_table = QLabel('Biprism Deflection = ' + "{:.2f}".format(deflection))
+        
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.updefxlabel_table)
+        hbox_labels.addWidget(self.updefylabel_table)
+        hbox_labels.addWidget(self.lowdefxlabel_table)
+        hbox_labels.addWidget(self.lowdefylabel_table)
+        hbox_labels.addWidget(self.defratioylabel_table)
+        
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        self.table.setLayout(vbox)
 
 
 class ModelGui():
@@ -716,3 +811,19 @@ class ApertureGui():
         vbox.addStretch()
 
         self.box.setLayout(vbox)
+        
+        self.table = QGroupBox(name)
+        self.radiuslabel_table = QLabel('Aperture Radius = ' + "{:.2f}".format(inner_radius))
+        self.xlabel_table = QLabel('X Position = ' + "{:.2f}".format(x))
+        self.ylabel_table = QLabel('Y Position = ' + "{:.2f}".format(y))
+        
+        hbox = QHBoxLayout()
+        hbox_labels = QHBoxLayout()
+        hbox_labels.addWidget(self.xlabel_table)
+        hbox_labels.addWidget(self.ylabel_table)
+        hbox_labels.addWidget(self.radiuslabel_table)
+
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox_labels)
+        vbox.addLayout(hbox)
+        self.table.setLayout(vbox)

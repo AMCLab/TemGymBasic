@@ -7,7 +7,8 @@ import os
 import sys 
 
 def main():
-    components = [comp.Lens(name = 'Lens', z = 0.5, f = -0.5)]
+    components = [comp.Lens(name = 'Lens', z = 0.5, f = -0.5),
+                  comp.AstigmaticLens(name = 'Astigmatic Lens', z = 0.25)]
     
     model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.15)
     

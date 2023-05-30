@@ -73,13 +73,16 @@ class LinearTEMUi(QMainWindow):
         self.tem_dock = Dock("3D View")
         self.detector_dock = Dock("Detector", size=(5, 5))
         self.gui_dock = Dock("GUI", size=(10, 3))
+        self.table_dock = Dock("Parameter Table", size = (5, 5))
 
 
         self.centralWidget.addDock(self.tem_dock, "left")
 
-        self.centralWidget.addDock(self.detector_dock, "bottom", self.tem_dock)
+        self.centralWidget.addDock(self.table_dock, "bottom", self.tem_dock)
 
         self.centralWidget.addDock(self.gui_dock, "right")
+        
+        self.centralWidget.addDock(self.detector_dock, "above", self.table_dock)
         
         #create detector
         scale = self.model.detector_size/2
@@ -147,18 +150,29 @@ class LinearTEMUi(QMainWindow):
         scroll.setWidgetResizable(1)
         content = QWidget()
         scroll.setWidget(content)
-        self.layout = QVBoxLayout(content)
+        self.gui_layout = QVBoxLayout(content)
         
         self.gui_dock.addWidget(scroll, 1, 0)
         
         self.model.create_gui()
 
-        self.layout.addWidget(self.model.gui.box, 0)
+        self.gui_layout.addWidget(self.model.gui.box, 0)
         
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(1)
+        content = QWidget()
+        scroll.setWidget(content)
+        self.table_layout = QVBoxLayout(content)
+        
+        self.table_dock.addWidget(scroll, 1, 0)
+        
+        self.model.create_gui()
+
         #Loop through all components, and display the GUI for each
         for idx, component in enumerate(self.model.components, start = 1):
             component.create_gui()
-            self.layout.addWidget(component.gui.box, idx)
+            self.gui_layout.addWidget(component.gui.box, idx)
+            self.table_layout.addWidget(component.gui.table, 0)
     
 # Create a Controller class to connect the GUI and the model
 class LinearTEMCtrl:

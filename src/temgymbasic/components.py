@@ -93,11 +93,13 @@ class Lens():
         '''        
         self.gui.flabel.setText(
             'Focal Length = ' + "{:.2f}".format(self.f))
+        self.gui.flabel_table.setText(
+            'Focal Length = ' + "{:.2f}".format(self.f))
         
     def create_gui(self):
         '''
         '''        
-        self.gui = LensGui(self.name + ' Interface', self.f)
+        self.gui = LensGui(self.name, self.f)
         
     def update_gui(self):
         '''
@@ -207,11 +209,15 @@ class AstigmaticLens():
             self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
         self.gui.fylabel.setText(
             self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
+        self.gui.fxlabel_table.setText(
+            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
+        self.gui.fylabel_table.setText(
+            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
         
     def create_gui(self): 
         '''
         '''        
-        self.gui = AstigmaticLensGui(self.name + ' Interface', self.gui_label, self.fx, self.fy)
+        self.gui = AstigmaticLensGui(self.name, self.gui_label, self.fx, self.fy)
         
     def update_gui(self):
         '''
@@ -300,7 +306,7 @@ class Sample():
     def create_gui(self): 
         '''
         '''         
-        self.gui = SampleGui(self.name + ' Interface', self.x, self.y)
+        self.gui = SampleGui(self.name, self.x, self.y)
 
     def set_gl_label(self): 
         '''
@@ -427,11 +433,15 @@ class Quadrupole():
             self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
         self.gui.fylabel.setText(
             self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
+        self.gui.fxlabel_table.setText(
+            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
+        self.gui.fylabel_table.setText(
+            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
         
     def create_gui(self):
         '''
         '''        
-        self.gui = AstigmaticLensGui(self.name + ' Interface', self.type, self.fx, self.fy)
+        self.gui = AstigmaticLensGui(self.name, self.type, self.fx, self.fy)
         
     def update_gui(self):
         '''
@@ -538,11 +548,16 @@ class Deflector():
             'X Deflection = ' + "{:.2f}".format(self.defx))
         self.gui.defylabel.setText(
             'Y Deflection = ' + "{:.2f}".format(self.defy))
+        self.gui.defxlabel_table.setText(
+            'X Deflection = ' + "{:.2f}".format(self.defx))
+        self.gui.defylabel_table.setText(
+            'Y Deflection = ' + "{:.2f}".format(self.defy))
+        
         
     def create_gui(self):  
         '''
         '''        
-        self.gui = DeflectorGui(self.name + ' Interface', self.defx, self.defy)
+        self.gui = DeflectorGui(self.name, self.defx, self.defy)
         
     def update_gui(self):
         '''
@@ -689,11 +704,23 @@ class DoubleDeflector():
             'Lower Deflector X Response Ratio = ' + "{:.2f}".format(self.defratiox))
         self.gui.defratioylabel.setText(
             'Lower Deflector Y Response Ratio = ' + "{:.2f}".format(self.defratioy))
+        self.gui.updefxlabel_table.setText(
+            'X Deflection = ' + "{:.2f}".format(self.updefx))
+        self.gui.updefylabel_table.setText(
+            'Y Deflection = ' + "{:.2f}".format(self.updefy))
+        self.gui.lowdefxlabel_table.setText(
+            'X Deflection = ' + "{:.2f}".format(self.lowdefx))
+        self.gui.lowdefylabel_table.setText(
+            'Y Deflection = ' + "{:.2f}".format(self.lowdefy))
+        self.gui.defratioxlabel_table.setText(
+            'Lower Deflector X Response Ratio = ' + "{:.2f}".format(self.defratiox))
+        self.gui.defratioylabel_table.setText(
+            'Lower Deflector Y Response Ratio = ' + "{:.2f}".format(self.defratioy))
         
     def create_gui(self):
         '''
         '''        
-        self.gui = DoubleDeflectorGui(self.name + ' Interface', self.updefx, self.updefy, self.lowdefx, self.lowdefy)
+        self.gui = DoubleDeflectorGui(self.name, self.updefx, self.updefy, self.lowdefx, self.lowdefy)
         
     def update_gui(self):
         '''
@@ -816,11 +843,15 @@ class Biprism():
             'Biprism Deflection = ' + "{:.2f}".format(self.deflection))
         self.gui.rotlabel.setText(
             'Rotation (Radians) = ' + "{:.2f}".format(self.theta))
+        self.gui.deflabel_table.setText(
+            'Biprism Deflection = ' + "{:.2f}".format(self.deflection))
+        self.gui.rotlabel_table.setText(
+            'Rotation (Radians) = ' + "{:.2f}".format(self.theta))
         
     def create_gui(self):   
         '''
         '''        
-        self.gui = BiprismGui(self.name + ' Interface', self.deflection, self.theta)
+        self.gui = BiprismGui(self.name, self.deflection, self.theta)
         
     def update_gui(self):
         '''
@@ -886,7 +917,7 @@ class Aperture():
     def create_gui(self):
         '''
         '''        
-        self.gui = ApertureGui(self.name + ' Interface', self.min_radius, self.max_radius, self.aperture_radius_inner, self.x, self.y)
+        self.gui = ApertureGui(self.name, self.min_radius, self.max_radius, self.aperture_radius_inner, self.x, self.y)
         
     def set_gl_geom(self):
         '''
@@ -926,6 +957,12 @@ class Aperture():
         self.gui.xlabel.setText(
             'Aperture X Position = ' + "{:.4f}".format(self.x))
         self.gui.ylabel.setText(
+            'Aperture Y Position = ' + "{:.4f}".format(self.y))
+        self.gui.radiuslabel_table.setText(
+            'Aperture Radius = ' + "{:.4f}".format(self.aperture_radius_inner))
+        self.gui.xlabel_table.setText(
+            'Aperture X Position = ' + "{:.4f}".format(self.x))
+        self.gui.ylabel_table.setText(
             'Aperture Y Position = ' + "{:.4f}".format(self.y))
         
         
