@@ -9,7 +9,7 @@ components = [
 
 axis_view = 'x_axial'
 model_ = Model(components, beam_z=1.0, beam_type='x_axial',
-                   num_rays=32, beam_semi_angle=0.15)
+                   num_rays=32, gun_beam_semi_angle=0.15)
 
 name = 'condenser_astigmatism.svg'
 fig, ax = show_matplotlib(model_, name = name)

@@ -16,7 +16,7 @@ def main():
 
     #Generate TEM Model
     model_ = Model(components, beam_z=1.5, beam_type='point',
-                num_rays=32, beam_semi_angle=0.03)
+                num_rays=32, gun_beam_semi_angle=0.03)
     
     viewer = run_pyqt(model_)  
     

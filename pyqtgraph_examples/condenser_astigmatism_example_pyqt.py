@@ -10,7 +10,7 @@ def main():
         comp.Quadrupole(name='Condenser Stigmator', z=0.5)
     ]
     
-    model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 32, beam_semi_angle = 0.03)
+    model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 32, gun_beam_semi_angle = 0.03)
     
     viewer = run_pyqt(model_)  
 

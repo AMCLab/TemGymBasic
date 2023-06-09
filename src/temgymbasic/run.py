@@ -1,5 +1,5 @@
 from functools import partial
-from temgymbasic.functions import get_image_from_rays
+from temgymbasic.functions import get_image_from_rays, convert_rays_to_line_vertices
 
 import PyQt5
 from PyQt5.QtWidgets import QMainWindow
@@ -21,9 +21,12 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 import time
+import os
+
 
 mpl.rcParams['font.family'] = 'Helvetica'
 mpl.rc('axes', titlesize=32, labelsize=28)
+pg.setConfigOption('imageAxisOrder', 'row-major')
 
 __version__ = "0.5.9.2"
 __author__ = "David Landers"
@@ -52,8 +55,8 @@ class LinearTEMUi(QMainWindow):
         super().__init__()
         
         #%%% Define Camera Parameters
-        self.initial_camera_params = {'center': PyQt5.QtGui.QVector3D(-0.5, -0.5, 0.0),
-                                 'fov': 25, 'azimuth': 45.0, 'distance': 10, 'elevation': 25.0, }
+        self.initial_camera_params = {'center': PyQt5.QtGui.QVector3D(0.5, 0.5, 0.0),
+                                 'fov': 25, 'azimuth': -45.0, 'distance': 10, 'elevation': 25.0, }
 
         self.x_camera_params = {'center': PyQt5.QtGui.QVector3D(0.0, 0.0, 0.5),
                            'fov': 7e-07, 'azimuth': 90.0, 'distance': 143358760, 'elevation': 0.0}
@@ -90,7 +93,7 @@ class LinearTEMUi(QMainWindow):
                             [1, -1, 0], [1, 1, 0]]) * scale
         
         self.detector_outline = gl.GLLinePlotItem(pos=vertices, color="w", mode='line_strip')
-
+            
         # Create the display and the buttons
         self.create3DDisplay()
         self.createDetectorDisplay()
@@ -106,6 +109,20 @@ class LinearTEMUi(QMainWindow):
         #and detector outline.
         axis = gl.GLAxisItem()
         self.tem_window.addItem(axis)
+        
+        pos = np.empty((4, 3))
+        size = np.empty((4))
+        color = np.empty((4, 4))
+
+        pos[0] = (1,0,0); size[0] = 0.1; color[0] = (1.0, 0.0, 0.0, 0.5) #x
+        pos[1] = (0,1,0); size[1] = 0.1; color[1] = (0.0, 1.0, 0.0, 0.5) #y
+        pos[2] = (0,0,1); size[2] = 0.1; color[2] = (0.0, 0.0, 1.0, 0.5) #z
+        pos[3] = (0.125,0.125,0.5); size[3] = 0.1; color[3] = (1.0, 1.0, 1.0, 0.5) #z
+        
+        sp1 = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
+        
+        self.tem_window.addItem(sp1)
+        
         self.tem_window.setBackgroundColor((150, 150, 150, 255))
         self.tem_window.setCameraPosition(distance=5)
         self.ray_geometry = gl.GLLinePlotItem(mode='lines', width=2)
@@ -117,6 +134,9 @@ class LinearTEMUi(QMainWindow):
         for component in self.model.components:
             for geometry in component.gl_points:
                 self.tem_window.addItem(geometry)
+                
+                if component.type == 'Sample':
+                    self.tem_window.addItem(component.sample_image_item)
                 
             self.tem_window.addItem(component.label)
         
@@ -157,6 +177,7 @@ class LinearTEMUi(QMainWindow):
         self.model.create_gui()
 
         self.gui_layout.addWidget(self.model.gui.box, 0)
+        self.gui_layout.addWidget(self.model.experiment_gui.box, 0)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(1)
@@ -166,7 +187,7 @@ class LinearTEMUi(QMainWindow):
         
         self.table_dock.addWidget(scroll, 1, 0)
         
-        self.model.create_gui()
+        # self.model.create_gui()
 
         #Loop through all components, and display the GUI for each
         for idx, component in enumerate(self.model.components, start = 1):
@@ -178,7 +199,7 @@ class LinearTEMUi(QMainWindow):
 class LinearTEMCtrl:
     '''Control code which links the model and 3D viewer
     '''
-    def __init__(self, model, view):
+    def __init__(self, model, viewer):
         '''
 
         Parameters
@@ -189,19 +210,27 @@ class LinearTEMCtrl:
             UI Viewer
         '''        
         self.model = model
-        self.view = view
+        self.viewer = viewer
         
-        #Create a timer
+        self.scan_started = False
+        
+        #Create a timer for 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.setInterval(10)
+        self.timer.setInterval(0)
         
         # Connect signals and slots
         self.connectSignals()
         self.update()
     
-    def timerstart(self, btn, component):
-        '''Start a timer
+    def scantimerstart(self):
+        '''Start a timer that will update the scan positions
+        '''
+        self.timer.start()
+        self.scan_started = not self.scan_started
+    
+    def wobbletimerstart(self, btn, component):
+        '''Start a timer that will update the beam wobblers which is used to set the deflector ratio
 
         Parameters
         ----------
@@ -224,16 +253,14 @@ class LinearTEMCtrl:
                     self.timer.start()
                     # making other check box to uncheck
                     component.gui.xbuttonwobble.setChecked(False)
-
-            elif component.type == 'Lens':
-                self.timer.start()
         else:
             self.timer.stop()
 
     def connectSignals(self):
-        '''Connect the updates to the model to the GUI
+        '''Connect the updates of the model to the GUI
         '''        
         self.model.gui.rayslider.valueChanged.connect(self.update)
+        self.model.experiment_gui.scanpixelsslider.valueChanged.connect(self.update)
         self.model.gui.checkBoxParalell.stateChanged.connect(self.update)
         self.model.gui.checkBoxPoint.stateChanged.connect(self.update)
         self.model.gui.checkBoxAxial.stateChanged.connect(self.update)
@@ -245,10 +272,13 @@ class LinearTEMCtrl:
         self.model.gui.xangleslider.valueChanged.connect(self.update)
         self.model.gui.yangleslider.valueChanged.connect(self.update)
         
+        if self.model.experiment == '4DSTEM':
+            self.model.experiment_gui.FOURDSTEM_experiment_button.clicked.connect(self.scantimerstart)
+            
         for component in self.model.components:
             if component.type == 'Lens':
                 component.gui.fslider.valueChanged.connect(self.update)
-                component.gui.fwobble.toggled.connect(partial(self.timerstart, component.gui.fwobble, component))
+                component.gui.fwobble.toggled.connect(partial(self.wobbletimerstart, component.gui.fwobble, component))
             elif component.type == 'Deflector':
                 component.gui.defxslider.valueChanged.connect(self.update)
                 component.gui.defyslider.valueChanged.connect(self.update)
@@ -259,8 +289,8 @@ class LinearTEMCtrl:
                 component.gui.lowdefyslider.valueChanged.connect(self.update)
                 component.gui.defratioxslider.valueChanged.connect(self.update)
                 component.gui.defratioyslider.valueChanged.connect(self.update)
-                component.gui.xbuttonwobble.toggled.connect(partial(self.timerstart, component.gui.xbuttonwobble, component))
-                component.gui.ybuttonwobble.toggled.connect(partial(self.timerstart, component.gui.ybuttonwobble, component))
+                component.gui.xbuttonwobble.toggled.connect(partial(self.wobbletimerstart, component.gui.xbuttonwobble, component))
+                component.gui.ybuttonwobble.toggled.connect(partial(self.wobbletimerstart, component.gui.ybuttonwobble, component))
             elif component.type == 'Biprism':
                 component.gui.defslider.valueChanged.connect(self.update)
                 component.gui.rotslider.valueChanged.connect(self.update)
@@ -287,63 +317,90 @@ class LinearTEMCtrl:
             ''
         '''        
         if btn == self.model.gui.x_button:
-            self.view.tem_window.setCameraParams(**self.view.x_camera_params)
+            self.viewer.tem_window.setCameraParams(**self.viewer.x_camera_params)
         elif btn == self.model.gui.y_button:
-            self.view.tem_window.setCameraParams(**self.view.y_camera_params)
+            self.viewer.tem_window.setCameraParams(**self.viewer.y_camera_params)
         elif btn == self.model.gui.init_button:
-            self.view.tem_window.setCameraParams(**self.view.initial_camera_params)
+            self.viewer.tem_window.setCameraParams(**self.viewer.initial_camera_params)
+            
             
     def update(self):
         '''Update the model
         '''        
-        self.model.update_gui()
+        if self.viewer is not None:
+            self.model.update_parameters_from_gui()
+            
+            if self.timer.isActive() and self.model.experiment == '4DSTEM' and self.scan_started == True:
+                self.update_scan_coil_ratio()
+                self.update_scan_position()
+            else:
+                #update components
+                for component in self.model.components:
+                    component.update_parameters_from_gui()
+            
+            self.model.step()
+            lines_paired, allowed_rays = convert_rays_to_line_vertices(self.model)
+                            
+            #Create detector image of rays
+            detector_ray_image, detector_sample_image, _ = get_image_from_rays(
+                self.model.r[-1, 0, allowed_rays], self.model.r[-1, 2, allowed_rays], 
+                self.model.r[self.model.sample_r_idx, 0, allowed_rays], self.model.r[self.model.sample_r_idx, 2, allowed_rays], 
+                self.model.detector_size, self.model.detector_pixels,
+                self.model.components[self.model.sample_idx].sample_size, self.model.components[self.model.sample_idx].sample_pixels,
+                self.model.components[self.model.sample_idx].sample
+                )
+            
+            #Update the spot image and the rays of the viewerer 
+            self.viewer.spot_img.setImage(detector_sample_image)
+            self.viewer.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
+            
+    def update_scan_coil_ratio(self):
         
-        #update components
-        for component in self.model.components:
-            component.update_gui()
+        sample_size = self.model.components[self.model.sample_idx].sample_size
+    
+        scan_position_x = sample_size/(2*self.model.scan_pixels)+(self.model.scan_pixel_x/self.model.scan_pixels)*sample_size - sample_size/2
+        scan_position_y = sample_size/(2*self.model.scan_pixels)+(self.model.scan_pixel_y/self.model.scan_pixels)*sample_size - sample_size/2
+    
+        #Distance to front focal plane from bottom deflector
+        dist_to_ffp = abs(self.model.scan_coils.z_low-(self.model.obj_lens.z+abs(self.model.obj_lens.f)))
+        dist_to_lens = abs(self.model.scan_coils.z_low-self.model.obj_lens.z)
+        
+        self.model.scan_coils.defratiox = -1-1*self.model.scan_coils.dist/dist_to_ffp
+        self.model.scan_coils.defratioy = -1-1*self.model.scan_coils.dist/dist_to_ffp
+        
+        #upper_deflection = x_specimen/(scan_coil_distance + distance_to_lens*deflector_ratio+distance_to_lens)
+        self.model.scan_coils.updefx = scan_position_x/(self.model.scan_coils.dist+dist_to_lens*self.model.scan_coils.defratiox+dist_to_lens)
+        self.model.scan_coils.lowdefx = self.model.scan_coils.defratiox*self.model.scan_coils.updefx
+        
+        self.model.scan_coils.updefy = scan_position_y/(self.model.scan_coils.dist+dist_to_lens*self.model.scan_coils.defratiox+dist_to_lens)
+        self.model.scan_coils.lowdefy = self.model.scan_coils.defratioy*self.model.scan_coils.updefy
+        
+        self.model.scan_coils.set_matrices()
+        
+        self.model.descan_coils.defratiox = (-1-1*self.model.scan_coils.dist/dist_to_ffp)
+        self.model.descan_coils.defratioy = (-1-1*self.model.scan_coils.dist/dist_to_ffp)
+        
+        #upper_deflection = x_specimen/(scan_coil_distance + distance_to_lens*deflector_ratio+distance_to_lens)
+        self.model.descan_coils.updefx = -self.model.scan_coils.updefx*(self.model.scan_coils.dist+self.model.scan_coils.defratiox*dist_to_lens+dist_to_lens)/self.model.descan_coils.dist
+        self.model.descan_coils.lowdefx = -self.model.descan_coils.updefx
+        
+        self.model.descan_coils.updefy = -self.model.scan_coils.updefy*(self.model.scan_coils.dist+self.model.scan_coils.defratiox*dist_to_lens+dist_to_lens)/self.model.descan_coils.dist
+        self.model.descan_coils.lowdefy = -self.model.descan_coils.updefy
+        
+        self.model.descan_coils.set_matrices()
+            
+    def update_scan_position(self):
+        
+        self.model.scan_pixel_x +=1
 
-        self.model.step()
-        
-        ray_z = np.tile(self.model.z_positions, [self.model.num_rays, 1, 1]).T
-        
-        # Stack with the z coordinates
-        ray_xyz = np.hstack((self.model.r[:, [0, 2], :], ray_z))
-        
-        # Repeat vertices so we can create lines. The shape of this array is [Num Steps*2, 3, Num Rays]
-        lines_repeated = np.repeat(ray_xyz[:, :, :], repeats=2, axis=0)[1:-1]
-        
-        #create a range of numbers of the number of rays, which are initially the rays that are unblocked
-        allowed_rays = range(self.model.num_rays)
-        for component in self.model.components:
-            if len(component.blocked_ray_idcs) != 0:
-                
-                #Find the difference between blocked rays and original amount of allowed rays
-                allowed_rays = list(set(allowed_rays).difference(set(component.blocked_ray_idcs)))
-                
-                idx = component.index*2+2
-                #Get the coordinates of all rays which hit the aperture.
-                pts_blocked = lines_repeated[idx, :, component.blocked_ray_idcs]
-                
-                #Do really funky array manipulation to create a copy of all of these points that is the same shape as the vertices of remaining lines
-                #after the aperture
-                lines_aperture = np.broadcast_to(pts_blocked[...,None], pts_blocked.shape+(lines_repeated.shape[0]-(idx),)).transpose(2, 1, 0)
-                
-                #Copy the coordinate of all rays that hit the aperture, to all line vertices after this, so we don't visualise them.
-                lines_repeated[idx:, :, component.blocked_ray_idcs] = lines_aperture
-        
-        # Then restack each line so that we end up with a long list of lines, from [Num Steps*2, 3, Num Rays] > [(Num Steps*2-2)*Num rays, 3]
-        # see > https://stackoverflow.com/questions/38509196/efficiently-re-stacking-a-numpy-ndarray
-        lines_paired = lines_repeated.transpose(2, 0, 1).reshape(
-            lines_repeated.shape[0]*self.model.num_rays, 3)
-        
-        #Create detector image
-        detector_image, _ = get_image_from_rays(
-            self.model.r[-1, 2, allowed_rays], self.model.r[-1, 0, allowed_rays], self.model.detector_size, self.model.detector_pixels)
-        
-        #Update the spot image and the rays of the viewer 
-        self.view.spot_img.setImage(detector_image.T)
-
-        self.view.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
+        if self.model.scan_pixel_x == self.model.scan_pixels:
+            self.model.scan_pixel_x = 0
+            self.model.scan_pixel_y +=1
+            if self.model.scan_pixel_y == self.model.scan_pixels:
+                self.timer.stop()
+                self.model.scan_pixel_y = 0
+                self.scan_started = False
+    
 class Ui_splashui(object):
     def setupUi(self, splashui):
         splashui.setObjectName("splashui")
@@ -360,6 +417,7 @@ class Ui_splashui(object):
         _translate = QtCore.QCoreApplication.translate
         splashui.setWindowTitle(_translate("splashui", "Form"))
         self.label.setText(_translate("splashui", "<html><head/><body><p align=\"center\"><span style=\" font-size:18pt; font-weight:600; color:#0089cd;\">TemGym</span><span style=\" font-size:18pt; font-weight:600; color:#009100;\">Basic</span></p><p align=\"center\"><span style=\" font-size:12pt;\">Created By David Landers, Dr. Andy Stewart, Dr. Ian Clancy, </span></p><p align=\"center\"><span style=\" font-size:12pt;\">Dr. Dieter Weber, Prof. Rafal Dunin-Borkowski.</span></p><p align=\"center\"><span style=\" font-size:12pt;\">Automated Microscopy &amp; Crystallography Lab</span></p><p align=\"center\"><span style=\" font-size:12pt;\">DOI - Coming Soon</span></p></body></html>"))
+
 class SplashScreen(QSplashScreen):
     def __init__(self):
         super(QSplashScreen, self).__init__()

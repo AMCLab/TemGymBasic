@@ -14,7 +14,7 @@ def main():
                   comp.Lens(name = 'Projector Lens', z = 0.1, f = -0.5)]
     
     #Generate Model
-    model_ = Model(components, beam_z = 1.5, beam_type = 'point', num_rays = 128, beam_semi_angle = 0.03)
+    model_ = Model(components, beam_z = 1.5, beam_type = 'point', num_rays = 128, gun_beam_semi_angle = 0.03)
     
     viewer = run_pyqt(model_)  
 

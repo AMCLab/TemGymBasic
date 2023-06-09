@@ -1,7 +1,7 @@
 
 import numpy as np
 from temgymbasic.functions import circular_beam, point_beam, axial_point_beam, x_axial_point_beam
-from temgymbasic.gui import ModelGui
+from temgymbasic.gui import ModelGui, ExperimentGui
 
 '''This class create the model composed of the specified components, and handles all of the computation
 that transmits the rays through each component.'''
@@ -11,9 +11,9 @@ class Model():
     multiplication and function updates to calculate their positions throughout
     the column.
     '''
-    def __init__(self, components, beam_z=1, num_rays=256, beam_type='point', 
-                 beam_semi_angle=np.pi/4, beam_tilt_x=0, beam_tilt_y=0, beam_width = 0.2,
-                 detector_size = 0.5, detector_pixels = 128):
+    def __init__(self, components, semiconv, overfocus, beam_z=1, num_rays=16, beam_type='point', 
+                 gun_beam_semi_angle=0, beam_tilt_x=0, beam_tilt_y=0, beam_radius = 0.125,
+                 detector_size = 0.5, detector_pixels = 128, experiment = None):
         '''
         Parameters
         ----------
@@ -33,13 +33,13 @@ class Model():
                     - 'axial' creates a beam which is only visible on the x and y axis.
                     - 'x_axial' creates a beam which is only visible on the x-axis. This is only used 
                     for matplotlib diagrams, by default 'point'
-        beam_semi_angle : float, optional
+        gun_beam_semi_angle : float, optional
             Set the semi angle of the beam in radians., by default np.pi/4
         beam_tilt_x : int, optional
             Set the tilt of the beam in the x direction, by default 0
         beam_tilt_y : int, optional
             Set the tilt of the beam in the y direction, by default 0
-        beam_width : float, optional
+        beam_radius : float, optional
             Set the width of the beam - only matters if "paralell" beam type is selected
         detector_size : float, optional
             Set the size of the detector, by default 0.5
@@ -49,14 +49,36 @@ class Model():
         '''        
         self.components = components
         self.num_rays = num_rays
-        self.beam_width = beam_width
+        self.beam_radius = beam_radius
         self.beam_z = beam_z
         self.beam_type = beam_type
-        self.beam_semi_angle = beam_semi_angle
-
+        self.gun_beam_semi_angle = gun_beam_semi_angle
+        
         self.beam_tilt_x = beam_tilt_x
         self.beam_tilt_y = beam_tilt_y
+        self.experiment = experiment
         
+        if self.experiment == '4DSTEM':
+            if self.components[0].type == 'Double Deflector':
+                
+                self.scan_coils = self.components[0]
+                self.obj_lens = self.components[1]
+                self.sample = self.components[2]
+                self.descan_coils = self.components[3]
+                
+                self.set_beam_radius_from_semiconv(semiconv)
+                self.set_obj_lens_f_from_overfocus(overfocus)
+                
+                self.scan_pixel_x = 0
+                self.scan_pixel_y = 0
+                
+            elif self.components[0].type != 'Double Deflector':
+                assert('Warning: First component in list is not a double deflector. If 4DSTEM experiment is chosen, \
+                       the first component in the list must be a pair of scan coils - i.e a double deflector')
+            elif len(self.components) != 4:
+                assert('Warning: There must be four components for now in a model 4DSTEM experiment: Scan coils, lens, sample and \
+                       descan coils.')
+
         #Need a special function for creating the z_positions of each component because and
         #double deflector is composed of two components, so we need to account for that. 
         self.set_z_positions()
@@ -71,6 +93,7 @@ class Model():
         self.detector_size = detector_size
         self.detector_pixels = detector_pixels
 
+        
     def set_z_positions(self):
         '''Create the z position list of all components in the model
         '''        
@@ -93,15 +116,37 @@ class Model():
                 self.z_positions.append(component.z)
                 component.index = idx + double_deflectors
                 
+            if component.type == 'Sample':
+                self.sample_r_idx = idx + double_deflectors + 1
+                self.sample_idx = idx
+                
         #Add the position of the detector
         self.z_positions.append(0)
     
+    def set_obj_lens_f_from_overfocus(self, overfocus):
+        if overfocus <= 0:    
+            assert('For now, only set positive overfocus values (crossover above sample).')
+        
+        self.overfocus = overfocus
+        
+        #Lens f is always a negative number, and overfocus for now is always a positive number
+        self.obj_lens.f = -1*(self.obj_lens.z-self.sample.z-self.overfocus)
+        
+    def set_beam_radius_from_semiconv(self, semiconv):
+        
+        self.semiconv = semiconv
+        self.beam_radius = abs(self.obj_lens.f)*np.tan(self.semiconv)
+        
     #Create the ModelGUI if we are running pyqtgraph
     def create_gui(self):
         '''Create the GUI
         '''        
         self.gui = ModelGui(self.num_rays, self.beam_type,
-                            self.beam_semi_angle, self.beam_tilt_x, self.beam_tilt_y)
+                            self.gun_beam_semi_angle, self.beam_tilt_x, self.beam_tilt_y, self.beam_radius)
+        
+        if self.experiment == '4DSTEM':
+            self.experiment_gui = ExperimentGui()
+            self.scan_pixels = self.experiment_gui.scanpixelsslider.value()
 
     def generate_rays(self):
         '''Generate electron rays
@@ -115,13 +160,13 @@ class Model():
         self.r[:, 4, :] = np.ones(self.num_rays)
 
         if self.beam_type == 'paralell':
-            self.r, self.spot_indices = circular_beam(self.r, self.beam_width)
+            self.r, self.spot_indices = circular_beam(self.r, self.beam_radius)
         elif self.beam_type == 'point':
-            self.r, self.spot_indices = point_beam(self.r, self.beam_semi_angle)
+            self.r, self.spot_indices = point_beam(self.r, self.gun_beam_semi_angle)
         elif self.beam_type == 'axial':
-            self.r = axial_point_beam(self.r, self.beam_semi_angle)
+            self.r = axial_point_beam(self.r, self.gun_beam_semi_angle)
         elif self.beam_type == 'x_axial':
-            self.r = x_axial_point_beam(self.r, self.beam_semi_angle)
+            self.r = x_axial_point_beam(self.r, self.gun_beam_semi_angle)
 
         self.r[:, 1, :] += self.beam_tilt_x
         self.r[:, 3, :] += self.beam_tilt_y
@@ -154,6 +199,7 @@ class Model():
             if component.type == 'Biprism':
                 x = abs(self.r[idx, 0, :])
                 y = abs(self.r[idx, 2, :])
+                
                 if component.theta != 0:
 
                     x_hit_biprism = np.where(x < component.width)[0]
@@ -200,15 +246,21 @@ class Model():
                 self.r[idx+1, :, :] = np.matmul(self.propagate(self.z_distances[idx]), self.r[idx, :, :])
                 idx += 1
 
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''Update the GUI
         '''        
         #This code updates the GUI sliders
         self.num_rays = 2**(self.gui.rayslider.value())
-        self.beam_semi_angle = self.gui.beamangleslider.value()*1e-2
-        self.beam_width = self.gui.beamwidthslider.value()*1e-3
+        self.gun_beam_semi_angle = self.gui.beamangleslider.value()*1e-2
+        
+        if self.experiment != '4DSTEM':
+            self.beam_radius = self.gui.beamwidthslider.value()*1e-3
+        else:
+            pass
+        
         self.allowed_ray_idcs = np.arange(self.num_rays)
 
+        
         self.beam_tilt_x = self.gui.xangleslider.value()*np.pi*1e-3
         self.beam_tilt_y = self.gui.yangleslider.value()*np.pi*1e-3
 
@@ -218,19 +270,27 @@ class Model():
             self.beam_type = 'paralell'
         if self.gui.checkBoxPoint.isChecked():
             self.beam_type = 'point'
+            
+        if self.experiment == '4DSTEM':
+            self.scan_pixels = 2**(self.experiment_gui.scanpixelsslider.value())
+            self.scanpixelsize = self.sample.width/self.scan_pixels
+            # self.overfocus = self.lens.z - abs(self.obj_lens.f)-self.sample.z
+            # self.semiconv = np.arctan((self.beam_radius)/abs(self.obj_lens.f))
+            self.cameralength = self.sample.z
 
         self.set_model_labels()
+        self.set_experiment_labels()
         self.generate_rays()
-
+        
     def set_model_labels(self):
         '''Set labels of the model inside the GUI
         '''        
         self.gui.raylabel.setText(
             str(self.num_rays))
         self.gui.beamanglelabel.setText(
-            str(round(self.beam_semi_angle, 2)))
+            str(round(self.gun_beam_semi_angle, 2)))
         self.gui.beamwidthlabel.setText(
-            str(round(self.beam_width, 2)))
+            str(round(self.beam_radius, 10)))
 
         self.gui.xanglelabel.setText(
             str('Beam Tilt X (Radians) = ' + "{:.3f}".format(self.beam_tilt_x))
@@ -238,6 +298,20 @@ class Model():
         self.gui.yanglelabel.setText(
             str('Beam Tilt Y (Radians) = ' + "{:.3f}".format(self.beam_tilt_y))
         )
+        
+    def set_experiment_labels(self):
+        '''Set labels of the model inside the GUI
+        '''        
+        self.experiment_gui.scanpixelslabel.setText(
+            str(self.scan_pixels))
+        self.experiment_gui.overfocuslabel.setText(
+            str('Overfocus = ' + str(round(self.overfocus, 7))))
+        self.experiment_gui.semiconvlabel.setText(
+            str('Semiconv = ' + str(round(self.semiconv, 4))))
+        self.experiment_gui.scanpixelsizelabel.setText(
+            str('Scan pixel size = ' + str(round(self.scanpixelsize, 4))))
+        self.experiment_gui.cameralengthlabel.setText(
+            str('Camera length = ' + str(round(self.cameralength, 4))))
 
     def step(self):
         '''Master function that updates the matrices and perfroms ray propagation

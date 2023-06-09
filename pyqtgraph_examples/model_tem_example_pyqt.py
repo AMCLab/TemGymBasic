@@ -33,7 +33,7 @@ def main():
                   ]
 
     model_ = Model(components, beam_z=3.5, beam_type='point',
-                   num_rays=256, beam_semi_angle=0.25)
+                   num_rays=256, gun_beam_semi_angle=0.25)
 
     viewer = run_pyqt(model_)  
 

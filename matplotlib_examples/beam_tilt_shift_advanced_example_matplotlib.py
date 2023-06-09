@@ -12,7 +12,7 @@ components = [comp.Lens(name = 'Condenser Lens', z = 1.2, f = -0.1),
 
 axis_view = 'x_axial'
 model_ = Model(components, beam_z=1.5, beam_type='x_axial',
-                   num_rays=32, beam_semi_angle=0.15)
+                   num_rays=32, gun_beam_semi_angle=0.15)
 
 name = 'beam_tilt.svg'
 fig, ax = show_matplotlib(model_, name = name)

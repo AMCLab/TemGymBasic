@@ -11,7 +11,7 @@ def main():
                   comp.Biprism(name = 'Biprism 1', z = 0.4),
                   comp.Biprism(name = 'Biprism 2', z = 0.2)]
 
-    model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 4096, beam_semi_angle = 0.1)
+    model_ = Model(components, beam_z = 1.0, beam_type = 'point', num_rays = 4096, gun_beam_semi_angle = 0.1)
     
     viewer = run_pyqt(model_)  
     

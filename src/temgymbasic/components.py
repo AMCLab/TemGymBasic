@@ -3,6 +3,8 @@ from temgymbasic.gui import *
 import pyqtgraph.opengl as gl
 import numpy as np
 from PyQt5.QtGui import QFont
+from pyqtgraph.Qt import QtGui
+import pyqtgraph as pg
 
 font = QFont()
 font.setPixelSize(20)
@@ -101,7 +103,7 @@ class Lens():
         '''        
         self.gui = LensGui(self.name, self.f)
         
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
         '''Update method called by the main loop of the programme
@@ -114,6 +116,7 @@ class Lens():
 
         self.set_flabel()
         self.set_matrix()
+        
 
 class AstigmaticLens():
     '''Creates an Astigmatic lens component and handles calls to GUI creation, updates to GUI
@@ -219,20 +222,18 @@ class AstigmaticLens():
         '''        
         self.gui = AstigmaticLensGui(self.name, self.gui_label, self.fx, self.fy)
         
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
         self.fx = self.gui.fxslider.value()*1e-3
         self.fy = self.gui.fyslider.value()*1e-3
         self.set_flabel()
         self.set_matrix()
-        
-    
 
 class Sample():
     '''Creates a sample component which serves only as a visualisation on the 3D model. 
     '''    
-    def __init__(self, z, name = '', label_radius = 0.3, width = 0.25, num_points = 50, x = 0., y = 0.):
+    def __init__(self, z = 0., sample = None, name = '', label_radius = 0.3, width = 0.25, num_points = 50, x = 0., y = 0.):
         '''
 
         Parameters
@@ -248,9 +249,11 @@ class Sample():
         num_points : int, optional
             Number of points to use to make the 3D model, by default 50
         x : float, optional
-            X position of sample model, by default 0
-        y : int, optional
-            Y position of sample model, by default 0
+            X position of sample model, by default 0.
+        y : float, optional
+            Y position of sample model, by default 0.
+        width : float, optional
+            Width of the edges of the square sample, by default 0.25
         '''        
 
         self.type = 'Sample'
@@ -262,12 +265,24 @@ class Sample():
         self.label_radius = label_radius
         self.num_points = num_points
         
+        self.sample_image_x = x - width/2
+        self.sample_image_y = y - width/2
+        self.sample_image_z = 0
+
+        self.sample = sample
+        self.sample_pixels = sample.shape[0]
+        self.sample_size = width
+        
         self.blocked_ray_idcs = []
         self.name = name
         self.set_matrix()
         self.set_gl_geom()
         self.set_gl_label()
-        
+
+        if sample is not None:
+            self.set_gl_image()
+
+
     def sample_matrix(self):
         '''Sample transfer matrix - simply a unit matrix of ones because we don't interact with the sample yet. 
 
@@ -302,6 +317,22 @@ class Sample():
                                  smooth=True, drawEdges=False))
         
         self.gl_points[0].setGLOptions('additive')
+
+    def set_gl_image(self):
+
+        tex = pg.makeRGBA(np.abs(self.sample.T), levels = (0, 1))[0]
+        self.sample_image_item = gl.GLImageItem(tex)
+        self.sample_image_item.scale(self.width/self.sample.shape[0], self.width/self.sample.shape[1], 1)
+
+        
+        dx = self.sample_image_x - self.x
+        dy = self.sample_image_y - self.y
+        self.sample_image_item.translate(dx, dy, 0, local = False)
+        self.sample_image_item.rotate(180, 0, 1, 0, local = False)
+        
+        dz = self.z - self.sample_image_z
+        self.sample_image_item.translate(0, 0, dz, local = False)
+        self.sample_image_item.rotate(180, 0, 0, 1+dz, local = False)
         
     def create_gui(self): 
         '''
@@ -314,6 +345,27 @@ class Sample():
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
         self.label.setData(font = font)
+        
+    def set_slabel(self):
+        '''
+        '''        
+        self.gui.xlabel.setText(
+            'X = ' + "{:.2f}".format(self.x))
+        self.gui.ylabel.setText(
+            'Y = ' + "{:.2f}".format(self.y))
+        self.gui.xlabel_table.setText(
+            'X = ' + "{:.2f}".format(self.x))
+        self.gui.ylabel_table.setText(
+            'Y = ' + "{:.2f}".format(self.y))
+    
+    def update_image(self):
+        dx = self.x_new-self.x
+        dy = self.y_new-self.y
+        
+        self.sample_image_item.translate(dx, dy, 0, local = False)
+        
+        self.sample_image_x = self.x + self.width/2
+        self.sample_image_y = self.y + self.width/2
     
     def update_mesh(self):
         '''
@@ -323,13 +375,19 @@ class Sample():
         self.gl_points[0].setMeshData(vertexes=self.verts, vertexColors=self.colors,
                                  smooth=True, drawEdges=False)
         
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
-        self.x = self.gui.xslider.value()*1e-2
-        self.y = self.gui.yslider.value()*1e-2
+        self.x_new = self.gui.xslider.value()*1e-2
+        self.y_new = self.gui.yslider.value()*1e-2
+        self.update_image()
+        
+        self.x = self.x_new
+        self.y = self.y_new
         self.update_mesh()
-    
+        
+        self.set_slabel()
+
 class Quadrupole():
     '''Creates a quadrupole component and handles calls to GUI creation, updates to GUI
         and stores the component matrix. Almost exactly the same as astigmatic lens component
@@ -443,7 +501,7 @@ class Quadrupole():
         '''        
         self.gui = AstigmaticLensGui(self.name, self.type, self.fx, self.fy)
         
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
         self.fx = self.gui.fxslider.value()*1e-3
@@ -559,7 +617,7 @@ class Deflector():
         '''        
         self.gui = DeflectorGui(self.name, self.defx, self.defy)
         
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
         self.defx = self.gui.defxslider.value()*1e-3
@@ -610,6 +668,7 @@ class DoubleDeflector():
         
         self.z_up = z_up
         self.z_low = z_low
+        self.dist = self.z_up - z_low
         self.radius = radius
         self.label_radius = label_radius
         self.num_points = num_points
@@ -620,8 +679,8 @@ class DoubleDeflector():
         self.lowdefx = lowdefx
         self.lowdefy = lowdefy
         
-        self.defratiox = 0
-        self.defratioy = 0
+        self.defratiox = -1.
+        self.defratioy = -1.
         
         self.name = name
         self.blocked_ray_idcs = []
@@ -722,7 +781,7 @@ class DoubleDeflector():
         '''        
         self.gui = DoubleDeflectorGui(self.name, self.updefx, self.updefy, self.lowdefx, self.lowdefy)
         
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
         self.updefx = self.gui.updefxslider.value()*1e-3
@@ -734,17 +793,35 @@ class DoubleDeflector():
         
         if self.gui.xbuttonwobble.isChecked():
             self.updefx = (np.sin(-1*2*np.pi*1e-2*self.xtime))
-            
             self.lowdefx = self.updefx*self.defratiox
             self.xtime += 1
+            
         if self.gui.ybuttonwobble.isChecked():
             self.updefy = (np.sin(-1*2*np.pi*1e-2*self.ytime))
             self.lowdefy = self.updefy*self.defratioy
             self.ytime += 1
         
+        if self.gui.usedefratio.isChecked():
+            self.updefx = self.gui.updefxslider.value()*1e-3
+            self.updefy = self.gui.updefyslider.value()*1e-3
+            self.lowdefx = self.updefx*self.defratiox
+            self.lowdefy = self.updefy*self.defratioy
+        
         self.set_deflabel()
         self.set_matrices()
         
+    def update_gui_from_parameters(self):
+
+        self.gui.updefxslider.setValue(self.updefx)
+        self.gui.updefyslider.setValue(self.updefy )
+        self.gui.lowdefxslider.setValue(self.lowdefx)
+        self.gui.lowdefyslider.setValue(self.lowdefy)
+        self.gui.defratiox.setValue(self.defratiox)
+        self.gui.udefratioy.setValue(self.defratioy)
+        
+        self.set_deflabel()
+        self.set_matrices()
+            
 class Biprism():
     '''Creates a biprism component and handles calls to GUI creation, updates to GUI and stores the component
     parameters. Important to note that the transfer matrix of the biprism is only cosmetic: It still
@@ -853,7 +930,7 @@ class Biprism():
         '''        
         self.gui = BiprismGui(self.name, self.deflection, self.theta)
         
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
         self.blocked_ray_idcs = []
@@ -989,7 +1066,7 @@ class Aperture():
 
         return matrix
     
-    def update_gui(self):
+    def update_parameters_from_gui(self):
         '''
         '''        
         self.aperture_radius_inner = self.gui.radiusslider.value()*1e-3

@@ -9,7 +9,7 @@ components = [comp.Biprism(name = 'Condenser Biprism', z = 0.7, theta=np.pi/2, w
 
 axis_view = 'x_axial'
 model_ = Model(components, beam_z=1.0, beam_type='x_axial',
-                   num_rays=32, beam_semi_angle=0.15)
+                   num_rays=32, gun_beam_semi_angle=0.15)
 
 
 name = 'split_condenser_biprism.svg'

@@ -208,8 +208,6 @@ class SampleGui():
         
         self.ylabel_table = QLabel('Y Position = ' + "{:.2f}".format(y))
         self.ylabel_table.setMinimumWidth(80)
-        hbox = QHBoxLayout()
-        hbox_labels = QHBoxLayout()
         hbox_labels.addWidget(self.ylabel_table)
 
         vbox = QVBoxLayout()
@@ -363,8 +361,8 @@ class DoubleDeflectorGui():
 
         self.lowdefyslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.lowdefyslider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.lowdefyslider.setMinimum(-3000)
-        self.lowdefyslider.setMaximum(3000)
+        self.lowdefyslider.setMinimum(-4000)
+        self.lowdefyslider.setMaximum(4000)
         self.lowdefyslider.setValue(int(round(lowdefx*1000)))
         self.lowdefyslider.setTickPosition(QSlider.TicksBelow)
 
@@ -393,9 +391,9 @@ class DoubleDeflectorGui():
         self.defratioxlabel = QLabel('Deflector X Response Ratio = ' + "{:.2f}".format(0))
         self.defratioxslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.defratioxslider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.defratioxslider.setMinimum(-3000)
-        self.defratioxslider.setMaximum(3000)
-        self.defratioxslider.setValue(-2000)
+        self.defratioxslider.setMinimum(-4000)
+        self.defratioxslider.setMaximum(4000)
+        self.defratioxslider.setValue(-1000)
         self.defratioxslider.setTickPosition(QSlider.TicksBelow)
 
         hbox = QHBoxLayout()
@@ -414,7 +412,7 @@ class DoubleDeflectorGui():
         self.defratioyslider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.defratioyslider.setMinimum(-3000)
         self.defratioyslider.setMaximum(3000)
-        self.defratioyslider.setValue(-2000)
+        self.defratioyslider.setValue(-1000)
         self.defratioyslider.setTickPosition(QSlider.TicksBelow)
 
         hbox = QHBoxLayout()
@@ -423,6 +421,13 @@ class DoubleDeflectorGui():
         hbox.addWidget(self.defratioyslider)
         hbox.addSpacing(10)
         hbox.addWidget(self.defratioylabel)
+
+        vbox.addLayout(hbox)
+        vbox.addStretch()
+        
+        self.usedefratio = QCheckBox("Use Def Ratio to Deflect Lower Deflector")
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.usedefratio)
 
         vbox.addLayout(hbox)
         vbox.addStretch()
@@ -529,11 +534,11 @@ class BiprismGui():
         vbox.addLayout(hbox)
         self.table.setLayout(vbox)
 
-
+# 
 class ModelGui():
     '''Overall GUI of the model
     '''    
-    def __init__(self, num_rays, beam_type, beam_semi_angle, beam_tilt_x, beam_tilt_y):
+    def __init__(self, num_rays, beam_type, gun_beam_semi_angle, beam_tilt_x, beam_tilt_y, beam_radius):
         '''
 
         Parameters
@@ -542,7 +547,7 @@ class ModelGui():
             Number of rays in the model
         beam_type : str
             Type of initial beam: Axial, paralell of point. 
-        beam_semi_angle : float
+        gun_beam_semi_angle : float
             Semi angle of the beam 
         beam_tilt_x : float
             Initial x tilt of the beam in radians
@@ -580,10 +585,10 @@ class ModelGui():
         self.beamangleslider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.beamangleslider.setMinimum(0)
         self.beamangleslider.setMaximum(157)
-        self.beamangleslider.setValue(int(round(beam_semi_angle, 2)*100))
+        self.beamangleslider.setValue(int(round(gun_beam_semi_angle, 2)*100))
         self.beamangleslider.setTickPosition(QSlider.TicksBelow)
 
-        self.beamanglelabel = QLabel(str(round(beam_semi_angle, 2)))
+        self.beamanglelabel = QLabel(str(round(gun_beam_semi_angle, 2)))
         self.beamanglelabel.setMinimumWidth(80)
         self.modelbeamanglelabel = QLabel('Axial/Paralell Beam Semi Angle')
 
@@ -601,7 +606,7 @@ class ModelGui():
         self.beamwidthslider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.beamwidthslider.setMinimum(0)
         self.beamwidthslider.setMaximum(1000)
-        self.beamwidthslider.setValue(0)
+        self.beamwidthslider.setValue(1)
         self.beamwidthslider.setTickPosition(QSlider.TicksBelow)
 
         self.beamwidthlabel = QLabel('0')
@@ -827,3 +832,74 @@ class ApertureGui():
         vbox.addLayout(hbox_labels)
         vbox.addLayout(hbox)
         self.table.setLayout(vbox)
+        
+class ExperimentGui():
+    '''GUI for the aperture component
+    '''    
+    def __init__(self):
+        '''
+
+        Parameters
+        ----------
+        name : str
+            Name of component
+        min_radius : float
+            Minimum radius of the aperture
+        max_radius : float
+            Max radius of the aperture
+        inner_radius : float
+            Initial inner radius of the aperture
+        x : float
+            X position of component
+        y : float
+            y position of component
+        '''
+        self.box = QGroupBox('Experiment')
+        self.scanpixelsslider = QSlider(QtCore.Qt.Orientation.Horizontal)
+        self.scanpixelsslider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.scanpixelsslider.setMinimum(2)
+        self.scanpixelsslider.setMaximum(8)
+        self.scanpixelsslider.setValue(256)
+        
+        self.scanpixelslabel = QLabel('Scan pixels = ' + str(int(self.scanpixelsslider.value())))
+        self.scanpixelslabel.setMinimumWidth(80)
+        
+        self.overfocuslabel = QLabel('Overfocus = Not Set')
+        self.overfocuslabel.setMinimumWidth(80)
+        
+        self.cameralengthlabel = QLabel('Camera length = Not Set')
+        self.cameralengthlabel.setMinimumWidth(80)
+        
+        self.semiconvlabel = QLabel('Semi conv = Not Set')
+        self.semiconvlabel.setMinimumWidth(80)
+        
+        self.scanpixelsizelabel = QLabel('Scan pixel size = Not Set')
+        self.scanpixelsizelabel.setMinimumWidth(80)
+
+        vbox = QVBoxLayout()
+        vbox.addStretch()
+
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.scanpixelsslider)
+        hbox.addSpacing(15)
+        hbox.addWidget(self.scanpixelslabel)
+        hbox.addSpacing(15)
+        hbox.addWidget(self.overfocuslabel)
+        hbox.addSpacing(15)
+        hbox.addWidget(self.semiconvlabel)
+        hbox.addSpacing(15)
+        hbox.addWidget(self.scanpixelsizelabel)
+        hbox.addSpacing(15)
+        hbox.addWidget(self.cameralengthlabel)
+        
+        
+        vbox.addLayout(hbox)
+        
+        self.FOURDSTEM_experiment_button = QPushButton('Run 4D STEM Experiment')
+        
+        hbox_push_buttons = QHBoxLayout()
+        hbox_push_buttons.addWidget(self.FOURDSTEM_experiment_button)
+        vbox.addLayout(hbox_push_buttons)
+
+        self.box.setLayout(vbox)
+

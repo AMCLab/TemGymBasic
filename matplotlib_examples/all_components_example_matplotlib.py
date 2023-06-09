@@ -15,7 +15,7 @@ components = [comp.Lens(name='Lens', z=0.85),
 
 #Generate TEM Model
 model_ = Model(components, beam_z=1, beam_type='x_axial',
-                   num_rays=32, beam_semi_angle=0.15)
+                   num_rays=32, gun_beam_semi_angle=0.15)
 
 #Save Figure with Matplotlib
 fig, ax = show_matplotlib(model_, name = 'all_components.svg', label_fontsize = 18)

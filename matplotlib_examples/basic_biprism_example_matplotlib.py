@@ -9,7 +9,7 @@ components = [comp.Biprism(name='Biprism', z=0.6, theta=np.pi/2, width=0.01),
 
 axis_view = 'x_axial'
 model_ = Model(components, beam_z=1.0, beam_type='x_axial',
-                   num_rays=32, beam_semi_angle=0.15)
+                   num_rays=32, gun_beam_semi_angle=0.15)
 
 name = 'biprism_model.svg'
 fig, ax = show_matplotlib(model_, name = name)

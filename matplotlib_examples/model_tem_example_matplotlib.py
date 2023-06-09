@@ -26,7 +26,7 @@ components = [comp.Lens(name = 'Electrostatic Lens', z = 3, f = -0.2),
 
 axis_view = 'x_axial'
 model_ = Model(components, beam_z=3.5, beam_type='x_axial',
-                   num_rays=32, beam_semi_angle=0.15)
+                   num_rays=32, gun_beam_semi_angle=0.15)
 
 name = 'model_tem.svg'
 fig, ax = show_matplotlib(model_, name = name, label_fontsize = 14)

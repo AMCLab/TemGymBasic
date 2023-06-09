@@ -1,6 +1,38 @@
 
 import numpy as np
+from scipy.interpolate import interp2d
 
+def make_test_sample(size = 256):
+    #Code From Dieter Weber
+    obj = np.ones((size, size), dtype=np.complex64)
+    y, x = np.ogrid[-size//2:size//2, -size//2:size//2]
+
+    outline = (((y*1.2)**2 + x**2) > (110/256*size)**2) & ((((y*1.2)**2 + x**2) < (120/256*size)**2))
+    obj[outline] = 0.0
+
+    left_eye = ((y + 40/256*size)**2 + (x + 40/256*size)**2) < (20/256*size)**2
+    obj[left_eye] = 0
+    right_eye = (np.abs(y + 40/256*size) < 15/256*size) & (np.abs(x - 40/256*size) < 30/256*size)
+    obj[right_eye] = 0
+
+    nose = (y + 20/256*size + x > 0) & (x < 0) & (y < 10/256*size)
+
+    obj[nose] = (0.05j * x + 0.05j * y)[nose]
+
+    mouth = (((y*1)**2 + x**2) > (50/256*size)**2) & ((((y*1)**2 + x**2) < (70/256*size)**2)) & (y > 20/256*size)
+
+    obj[mouth] = 0
+
+    tongue = (((y - 50/256*size)**2 + (x - 50/256*size)**2) < (20/256*size)**2) & ((y**2 + x**2) > (70/256*size)**2)
+    obj[tongue] = 0
+
+    # This wave modulation introduces a strong signature in the diffraction pattern
+    # that allows to confirm the correct scale and orientation.
+    signature_wave = np.exp(1j*(3 * y + 7 * x) * 2*np.pi/size)
+
+    obj += 0.3*signature_wave - 0.3
+
+    return np.abs(obj)
 
 def circular_beam(r, outer_radius):
     '''Generates a circular paralell initial beam 
@@ -79,14 +111,14 @@ def circular_beam(r, outer_radius):
     return r, num_points_kth_ring
 
 
-def point_beam(r, beam_semi_angle):
-    '''Generates a point initial beam that spreads out with semi angle 'beam_semi_angle'
+def point_beam(r, gun_beam_semi_angle):
+    '''Generates a point initial beam that spreads out with semi angle 'gun_beam_semi_angle'
 
     Parameters
     ----------
     r : ndarray
         Ray position and slope matrix
-    beam_semi_angle : float
+    gun_beam_semi_angle : float
         Beam semi angle in radians
 
     Returns
@@ -149,22 +181,22 @@ def point_beam(r, beam_semi_angle):
        for j in range(num_points_kth_ring[i]):
            radius = radii[i]
            t = j*(2 * np.pi / num_points_kth_ring[i])
-           r[0, 1, idx] = np.tan(beam_semi_angle*radius)*np.cos(t)
-           r[0, 3, idx] = np.tan(beam_semi_angle*radius)*np.sin(t)
+           r[0, 1, idx] = np.tan(gun_beam_semi_angle*radius)*np.cos(t)
+           r[0, 3, idx] = np.tan(gun_beam_semi_angle*radius)*np.sin(t)
            idx += 1
 
     return r, num_points_kth_ring
 
 
-def axial_point_beam(r, beam_semi_angle):
+def axial_point_beam(r, gun_beam_semi_angle):
     '''Generates a cross shaped initial beam on the x and y axis
-    that spreads out with semi angle 'beam_semi_angle'
+    that spreads out with semi angle 'gun_beam_semi_angle'
 
     Parameters
     ----------
     r : ndarray
         Ray position and slope matrix
-    beam_semi_angle : float
+    gun_beam_semi_angle : float
         Beam semi angle in radians
 
     Returns
@@ -175,9 +207,9 @@ def axial_point_beam(r, beam_semi_angle):
     num_rays = r.shape[2]
 
     x_rays = int(round(num_rays/2))
-    x_angles = np.linspace(-beam_semi_angle, beam_semi_angle, x_rays, endpoint=True)
+    x_angles = np.linspace(-gun_beam_semi_angle, gun_beam_semi_angle, x_rays, endpoint=True)
     y_rays = num_rays-x_rays
-    y_angles = np.linspace(-beam_semi_angle, beam_semi_angle, y_rays, endpoint=True)
+    y_angles = np.linspace(-gun_beam_semi_angle, gun_beam_semi_angle, y_rays, endpoint=True)
 
     for idx, angle in enumerate(x_angles):
         r[0, 1, idx] = np.tan(angle)
@@ -189,15 +221,15 @@ def axial_point_beam(r, beam_semi_angle):
     return r
 
 
-def x_axial_point_beam(r, beam_semi_angle):
+def x_axial_point_beam(r, gun_beam_semi_angle):
     '''Generates a cross shaped initial beam on the x axis
-    that spreads out with semi angle 'beam_semi_angle'
+    that spreads out with semi angle 'gun_beam_semi_angle'
 
     Parameters
     ----------
     r : ndarray
         Ray position and slope matrix
-    beam_semi_angle : float
+    gun_beam_semi_angle : float
         Beam semi angle in radians
 
     Returns
@@ -208,7 +240,7 @@ def x_axial_point_beam(r, beam_semi_angle):
     num_rays = r.shape[2]
 
     x_rays = int(round(num_rays))
-    x_angles = np.linspace(-beam_semi_angle, beam_semi_angle, x_rays, endpoint=True)
+    x_angles = np.linspace(-gun_beam_semi_angle, gun_beam_semi_angle, x_rays, endpoint=True)
 
     for idx, angle in enumerate(x_angles):
         r[0, 1, idx] = np.tan(angle)
@@ -216,7 +248,8 @@ def x_axial_point_beam(r, beam_semi_angle):
     return r
 
 
-def get_image_from_rays(rays_x, rays_y, detector_size, detector_pixels):
+def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_size, detector_pixels, 
+                        sample_size, sample_pixels, sample_image = None, flip_y = True, flip_x = True):
     '''From an image of rays that hit the detector at the base of the TEM
 
     Parameters
@@ -225,50 +258,158 @@ def get_image_from_rays(rays_x, rays_y, detector_size, detector_pixels):
         X position of rays that hit the detector
     rays_y : ndarray
         X position of rays that hit the detector
+    sample_rays_x : ndarray
+        X position of rays that hit the sample
+    sample_rays_y : ndarray
+        Y position of rays that hit the sample
     detector_size : float
         Real size of the detector in the model. Single value that describes it's edge length.
         Note that the detector is always square
     detector_pixels : int
-        Resolution of the detector.
-
+        Pixel resolution of the detector
+    sample_size : float
+        Real size of the sample in the model. Single value that describes it's edge length.
+        Note that the sample is always square
+    sample_pixels : int
+        Pixel resolution of the the sample
+    sample_image : 
+        image intensities of the sample. Used to form an image on the detector
     Returns
     -------
-    detector_image : ndarray
-        Image of where rays have hit the detector
-    image_pixel_coords : ndarray
+    detector_ray_image : ndarray
+        Ray image of where rays have hit the detector
+    detector_sample_image : ndarray
+        Sample image obtained by transferring ray which have hit the detector
+    detector_pixel_coords : ndarray
         Coordinates of where reach ray has hit the detector
     '''    
-    detector_image = np.zeros((detector_pixels, detector_pixels), dtype=np.uint8)
+    detector_ray_image = np.zeros((detector_pixels, detector_pixels), dtype=np.uint8)
+    detector_sample_image = np.zeros((detector_pixels, detector_pixels), dtype=np.uint8)
+      
+    
+    if flip_y == True:
+        sample_rays_y = sample_rays_y*-1
+        rays_y = rays_y*-1
+        
+    # if flip_x == True:
+    #     sample_rays_x = sample_rays_x*-1
+        
+    sample_pixel_coords_x = (
+        np.round(sample_rays_x / (sample_size) * sample_pixels) + sample_pixels//2-1
+    ).astype(np.int32)
 
+    sample_pixel_coords_y = (
+        np.round(sample_rays_y / (sample_size) * sample_pixels) + sample_pixels//2-1
+    ).astype(np.int32)
+    
+
+    sample_pixel_coords = np.vstack([sample_pixel_coords_x, sample_pixel_coords_y]).T
+    
     # set final image pixel coordinates
-    image_pixel_coords_x = (
+    detector_pixel_coords_x = (
         np.round(rays_x / (detector_size) * detector_pixels) + detector_pixels//2-1
     ).astype(np.int32)
 
-    image_pixel_coords_y = (
+    detector_pixel_coords_y = (
         np.round(rays_y / (detector_size) * detector_pixels) + detector_pixels//2-1
     ).astype(np.int32)
+    
+    # if flip_y == True:
+    #     detector_pixel_coords_y = detector_pixel_coords_y[::-1]
+        
+    detector_pixel_coords = np.vstack([detector_pixel_coords_x, detector_pixel_coords_y]).T
 
-    image_pixel_coords = np.vstack([image_pixel_coords_x, image_pixel_coords_y]).T
+    sample_rays_inside = np.all((sample_pixel_coords > 0) & (sample_pixel_coords < sample_pixels), axis=1).T
+    
+    detector_rays_inside = np.all((detector_pixel_coords > 0) & (detector_pixel_coords < detector_pixels), axis=1).T
+    
+    rays_that_hit_sample_and_detector = (sample_rays_inside & detector_rays_inside)
+    rays_that_hit_detector_but_not_sample = (~sample_rays_inside & detector_rays_inside)
+    
 
-    #Check if we have satisfied the failure mode which is for any pixel to have left the screen
-    if np.any(image_pixel_coords >= detector_pixels) or np.any(image_pixel_coords < 0):
-        image_pixel_coords = np.delete(image_pixel_coords, np.where(
-            (image_pixel_coords < 0) | (image_pixel_coords >= detector_pixels)), axis=0)
+    sample_pixel_intensities = sample_image[sample_pixel_coords[rays_that_hit_sample_and_detector, 1], sample_pixel_coords[rays_that_hit_sample_and_detector, 0]]
+    
+    # sample_pixel_intensities = sample_pixel_intensities[detector_rays_inside]
 
     #Use this set of commands if you just want a white beam
     # detector_image[
-    #     image_pixel_coords[:, 0],
-    #     image_pixel_coords[:, 1],
+    #     detector_pixel_coords[:, 0],
+    #     detector_pixel_coords[:, 1],
     # ] += 1
+    
+    detector_ray_image[
+        detector_pixel_coords[rays_that_hit_detector_but_not_sample, 1],
+        detector_pixel_coords[rays_that_hit_detector_but_not_sample, 0],
+    ] += 1
 
-    # convert the index array into a set of indices into detector_image.flat
-    flat_idx = np.ravel_multi_index(image_pixel_coords.T, detector_image.shape)
 
-    # get the set of unique indices and their corresponding counts
-    uidx, ucounts = np.unique(flat_idx, return_counts=True)
+    # # convert the index array into a set of indices into detector_image.flat
+    # flat_idx = np.ravel_multi_index(detector_pixel_coords[detector_rays_inside, :].T, detector_ray_image.shape)
 
-    # assign the count value to each unique index in acc.flat
-    detector_image.flat[uidx] = ucounts
+    # # get the set of unique indices and their corresponding counts
+    # uidx, ucounts = np.unique(flat_idx, return_counts=True)
 
-    return detector_image, image_pixel_coords
+    # # assign the count value to each unique index in acc.flat
+    # detector_ray_image.flat[uidx] = ucounts
+    
+    detector_sample_image[detector_pixel_coords[rays_that_hit_sample_and_detector, 1], detector_pixel_coords[rays_that_hit_sample_and_detector, 0]] = (sample_pixel_intensities*255).astype(np.int8)
+    detector_sample_image[detector_pixel_coords[rays_that_hit_detector_but_not_sample, 1], detector_pixel_coords[rays_that_hit_detector_but_not_sample, 0]] = 255
+    
+    
+    return detector_ray_image, detector_sample_image, detector_pixel_coords
+
+def convert_rays_to_line_vertices(model):
+        '''Converts a ray position matrix of size [(steps, 5, num rays)] - 
+        (where steps is defined by the number of components + 2 - the two being
+        included to add the gun and detector, which are not components chosen by the user)'
+        to a line matrix of shape [(steps)*2-2)*num rays, 3], which is of the correct shape
+        to be readily plot ray positions in the column as lines. 
+
+        Parameters
+        ----------
+        model : class
+            Microscope model that stores all associated ray position data 
+        gun_beam_semi_angle : float
+            Beam semi angle in radians
+
+        Returns
+        -------
+        r : ndarray
+            Updated ray position & slope matrix which create a circular beam
+        '''    
+        ray_z = np.tile(model.z_positions, [model.num_rays, 1, 1]).T
+        
+        # Stack with the z coordinates
+        ray_xyz = np.hstack((model.r[:, [0, 2], :], ray_z))
+        
+        # Repeat vertices so we can create lines. The shape of this array is [Num Steps*2, 3, Num Rays]
+        lines_repeated = np.repeat(ray_xyz[:, :, :], repeats=2, axis=0)[1:-1]
+        
+        #Index the total number of rays in the model initially which are by default allowed through all components
+        allowed_rays = range(model.num_rays)
+        
+        for component in model.components:
+            if len(component.blocked_ray_idcs) != 0:
+                
+                #Find the difference between blocked rays and original amount of allowed rays
+                allowed_rays = list(set(allowed_rays).difference(set(component.blocked_ray_idcs)))
+                
+                #Convert from ray position indexing, to line indexing
+                idx = component.index*2+2
+                
+                #Get the coordinates of all rays which hit the aperture.
+                pts_blocked = lines_repeated[idx, :, component.blocked_ray_idcs]
+                
+                #Do really funky array manipulation to create a copy of all of these points that is the same shape as the vertices of remaining lines
+                #after the aperture (I'm sorry to myself and anyone in the future who has to read this)
+                lines_aperture = np.broadcast_to(pts_blocked[...,None], pts_blocked.shape+(lines_repeated.shape[0]-(idx),)).transpose(2, 1, 0)
+                
+                #Copy the coordinate of all rays that hit the aperture, to all line vertices after this, so we don't visualise them.
+                lines_repeated[idx:, :, component.blocked_ray_idcs] = lines_aperture
+        
+        # Then restack each line so that we end up with a long list of lines, from [Num Steps*2, 3, Num Rays] > [(Num Steps*2-2)*Num rays, 3]
+        # see > https://stackoverflow.com/questions/38509196/efficiently-re-stacking-a-numpy-ndarray
+        lines_paired = lines_repeated.transpose(2, 0, 1).reshape(
+            lines_repeated.shape[0]*model.num_rays, 3)
+
+        return lines_paired, allowed_rays

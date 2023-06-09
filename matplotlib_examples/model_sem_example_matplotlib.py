@@ -13,7 +13,7 @@ components = [comp.Lens(name = '1st Condenser Lens', z = 1.5, f = -0.05),
 
 axis_view = 'x_axial'
 model_ = Model(components, beam_z=1.7, beam_type=axis_view,
-                   num_rays=65, beam_semi_angle=0.15)
+                   num_rays=65, gun_beam_semi_angle=0.15)
 
 name = 'model_sem.svg'
 fig, ax = show_matplotlib(model_, name = name)
