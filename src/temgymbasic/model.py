@@ -11,9 +11,9 @@ class Model():
     multiplication and function updates to calculate their positions throughout
     the column.
     '''
-    def __init__(self, components, semiconv, overfocus, beam_z=1, num_rays=16, beam_type='point', 
+    def __init__(self, components, beam_z=1, num_rays=16, beam_type='point', 
                  gun_beam_semi_angle=0, beam_tilt_x=0, beam_tilt_y=0, beam_radius = 0.125,
-                 detector_size = 0.5, detector_pixels = 128, experiment = None):
+                 detector_size = 0.5, detector_pixels = 128, experiment = None, experiment_params = {}):
         '''
         Parameters
         ----------
@@ -49,7 +49,12 @@ class Model():
         '''        
         self.components = components
         self.num_rays = num_rays
+        
         self.beam_radius = beam_radius
+        
+        #store an initial variable also to scale the GUI Slider
+        self.beam_radius_init = beam_radius
+        
         self.beam_z = beam_z
         self.beam_type = beam_type
         self.gun_beam_semi_angle = gun_beam_semi_angle
@@ -59,26 +64,24 @@ class Model():
         self.experiment = experiment
         
         if self.experiment == '4DSTEM':
+            
+            if self.components[0].type != 'Double Deflector':
+                assert('Warning: First component in list is not a double deflector. If 4DSTEM experiment is chosen, \
+                       the first component in the list must be a pair of scan coils - i.e a double deflector')
+            if len(self.components) != 4:
+                assert('Warning: There must be four components for now in a model 4DSTEM experiment: Scan coils, lens, sample and \
+                       descan coils.')
+
             if self.components[0].type == 'Double Deflector':
                 
                 self.scan_coils = self.components[0]
                 self.obj_lens = self.components[1]
                 self.sample = self.components[2]
                 self.descan_coils = self.components[3]
-                
-                self.set_beam_radius_from_semiconv(semiconv)
-                self.set_obj_lens_f_from_overfocus(overfocus)
-                
                 self.scan_pixel_x = 0
                 self.scan_pixel_y = 0
+                self.scan_pixels = 128
                 
-            elif self.components[0].type != 'Double Deflector':
-                assert('Warning: First component in list is not a double deflector. If 4DSTEM experiment is chosen, \
-                       the first component in the list must be a pair of scan coils - i.e a double deflector')
-            elif len(self.components) != 4:
-                assert('Warning: There must be four components for now in a model 4DSTEM experiment: Scan coils, lens, sample and \
-                       descan coils.')
-
         #Need a special function for creating the z_positions of each component because and
         #double deflector is composed of two components, so we need to account for that. 
         self.set_z_positions()
@@ -125,17 +128,21 @@ class Model():
     
     def set_obj_lens_f_from_overfocus(self, overfocus):
         if overfocus <= 0:    
-            assert('For now, only set positive overfocus values (crossover above sample).')
+            assert('For now, we only allow positive overfocus values (crossover above sample).')
         
         self.overfocus = overfocus
         
         #Lens f is always a negative number, and overfocus for now is always a positive number
         self.obj_lens.f = -1*(self.obj_lens.z-self.sample.z-self.overfocus)
+        self.obj_lens.set_matrix()
         
     def set_beam_radius_from_semiconv(self, semiconv):
         
         self.semiconv = semiconv
         self.beam_radius = abs(self.obj_lens.f)*np.tan(self.semiconv)
+        
+        #This is used for the GUI Slider
+        self.beam_radius_init = abs(self.obj_lens.f)*np.tan(self.semiconv)
         
     #Create the ModelGUI if we are running pyqtgraph
     def create_gui(self):
@@ -155,8 +162,10 @@ class Model():
         #steps is defined by the number of components.
         
         self.steps = len(self.z_positions)
+        
         self.r = np.zeros((self.steps, 5, self.num_rays),
                           dtype=np.float64)  # x, theta_x, y, theta_y, 1
+        
         self.r[:, 4, :] = np.ones(self.num_rays)
 
         if self.beam_type == 'paralell':
@@ -201,7 +210,6 @@ class Model():
                 y = abs(self.r[idx, 2, :])
                 
                 if component.theta != 0:
-
                     x_hit_biprism = np.where(x < component.width)[0]
                     y_hit_biprism = np.where(y < component.radius)[0]
 
@@ -252,11 +260,7 @@ class Model():
         #This code updates the GUI sliders
         self.num_rays = 2**(self.gui.rayslider.value())
         self.gun_beam_semi_angle = self.gui.beamangleslider.value()*1e-2
-        
-        if self.experiment != '4DSTEM':
-            self.beam_radius = self.gui.beamwidthslider.value()*1e-3
-        else:
-            pass
+        self.beam_radius = self.gui.beamwidthslider.value()*self.beam_radius_init
         
         self.allowed_ray_idcs = np.arange(self.num_rays)
 
@@ -274,14 +278,57 @@ class Model():
         if self.experiment == '4DSTEM':
             self.scan_pixels = 2**(self.experiment_gui.scanpixelsslider.value())
             self.scanpixelsize = self.sample.width/self.scan_pixels
-            # self.overfocus = self.lens.z - abs(self.obj_lens.f)-self.sample.z
-            # self.semiconv = np.arctan((self.beam_radius)/abs(self.obj_lens.f))
             self.cameralength = self.sample.z
 
         self.set_model_labels()
         self.set_experiment_labels()
         self.generate_rays()
         
+    def update_scan_coil_ratio(self):
+        
+        sample_size = self.components[self.sample_idx].sample_size
+    
+        scan_position_x = sample_size/(2*self.scan_pixels)+(self.scan_pixel_x/self.scan_pixels)*sample_size - sample_size/2
+        scan_position_y = sample_size/(2*self.scan_pixels)+(self.scan_pixel_y/self.scan_pixels)*sample_size - sample_size/2
+    
+        #Distance to front focal plane from bottom deflector
+        dist_to_ffp = abs(self.scan_coils.z_low-(self.obj_lens.z+abs(self.obj_lens.f)))
+        dist_to_lens = abs(self.scan_coils.z_low-self.obj_lens.z)
+        
+        self.scan_coils.defratiox = -1-1*self.scan_coils.dist/dist_to_ffp
+        self.scan_coils.defratioy = -1-1*self.scan_coils.dist/dist_to_ffp
+        
+        #upper_deflection = x_specimen/(scan_coil_distance + distance_to_lens*deflector_ratio+distance_to_lens)
+        self.scan_coils.updefx = scan_position_x/(self.scan_coils.dist+dist_to_lens*self.scan_coils.defratiox+dist_to_lens)
+        self.scan_coils.lowdefx = self.scan_coils.defratiox*self.scan_coils.updefx
+        
+        self.scan_coils.updefy = scan_position_y/(self.scan_coils.dist+dist_to_lens*self.scan_coils.defratiox+dist_to_lens)
+        self.scan_coils.lowdefy = self.scan_coils.defratioy*self.scan_coils.updefy
+        
+        self.scan_coils.set_matrices()
+        
+        self.descan_coils.defratiox = (-1-1*self.scan_coils.dist/dist_to_ffp)
+        self.descan_coils.defratioy = (-1-1*self.scan_coils.dist/dist_to_ffp)
+        
+        #upper_deflection = x_specimen/(scan_coil_distance + distance_to_lens*deflector_ratio+distance_to_lens)
+        self.descan_coils.updefx = -self.scan_coils.updefx*(self.scan_coils.dist+self.scan_coils.defratiox*dist_to_lens+dist_to_lens)/self.descan_coils.dist
+        self.descan_coils.lowdefx = -self.descan_coils.updefx
+        
+        self.descan_coils.updefy = -self.scan_coils.updefy*(self.scan_coils.dist+self.scan_coils.defratiox*dist_to_lens+dist_to_lens)/self.descan_coils.dist
+        self.descan_coils.lowdefy = -self.descan_coils.updefy
+        
+        self.descan_coils.set_matrices()
+        
+    def update_scan_position(self):
+        
+        self.scan_pixel_x +=1
+
+        if self.scan_pixel_x == self.scan_pixels:
+            self.scan_pixel_x = 0
+            self.scan_pixel_y += 1
+            if self.scan_pixel_y == self.scan_pixels:
+                self.scan_pixel_y = 0
+
     def set_model_labels(self):
         '''Set labels of the model inside the GUI
         '''        
@@ -290,7 +337,7 @@ class Model():
         self.gui.beamanglelabel.setText(
             str(round(self.gun_beam_semi_angle, 2)))
         self.gui.beamwidthlabel.setText(
-            str(round(self.beam_radius, 10)))
+            str(round(self.beam_radius, 5)))
 
         self.gui.xanglelabel.setText(
             str('Beam Tilt X (Radians) = ' + "{:.3f}".format(self.beam_tilt_x))
@@ -305,7 +352,7 @@ class Model():
         self.experiment_gui.scanpixelslabel.setText(
             str(self.scan_pixels))
         self.experiment_gui.overfocuslabel.setText(
-            str('Overfocus = ' + str(round(self.overfocus, 7))))
+            str('Overfocus = ' + str(round(self.overfocus, 4))))
         self.experiment_gui.semiconvlabel.setText(
             str('Semiconv = ' + str(round(self.semiconv, 4))))
         self.experiment_gui.scanpixelsizelabel.setText(

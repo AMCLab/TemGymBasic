@@ -247,7 +247,6 @@ def x_axial_point_beam(r, gun_beam_semi_angle):
 
     return r
 
-
 def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_size, detector_pixels, 
                         sample_size, sample_pixels, sample_image = None, flip_y = True, flip_x = True):
     '''From an image of rays that hit the detector at the base of the TEM
@@ -291,9 +290,6 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
         sample_rays_y = sample_rays_y*-1
         rays_y = rays_y*-1
         
-    # if flip_x == True:
-    #     sample_rays_x = sample_rays_x*-1
-        
     sample_pixel_coords_x = (
         np.round(sample_rays_x / (sample_size) * sample_pixels) + sample_pixels//2-1
     ).astype(np.int32)
@@ -302,7 +298,6 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
         np.round(sample_rays_y / (sample_size) * sample_pixels) + sample_pixels//2-1
     ).astype(np.int32)
     
-
     sample_pixel_coords = np.vstack([sample_pixel_coords_x, sample_pixel_coords_y]).T
     
     # set final image pixel coordinates
@@ -314,9 +309,6 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
         np.round(rays_y / (detector_size) * detector_pixels) + detector_pixels//2-1
     ).astype(np.int32)
     
-    # if flip_y == True:
-    #     detector_pixel_coords_y = detector_pixel_coords_y[::-1]
-        
     detector_pixel_coords = np.vstack([detector_pixel_coords_x, detector_pixel_coords_y]).T
 
     sample_rays_inside = np.all((sample_pixel_coords > 0) & (sample_pixel_coords < sample_pixels), axis=1).T
@@ -325,36 +317,16 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
     
     rays_that_hit_sample_and_detector = (sample_rays_inside & detector_rays_inside)
     rays_that_hit_detector_but_not_sample = (~sample_rays_inside & detector_rays_inside)
-    
 
     sample_pixel_intensities = sample_image[sample_pixel_coords[rays_that_hit_sample_and_detector, 1], sample_pixel_coords[rays_that_hit_sample_and_detector, 0]]
-    
-    # sample_pixel_intensities = sample_pixel_intensities[detector_rays_inside]
-
-    #Use this set of commands if you just want a white beam
-    # detector_image[
-    #     detector_pixel_coords[:, 0],
-    #     detector_pixel_coords[:, 1],
-    # ] += 1
     
     detector_ray_image[
         detector_pixel_coords[rays_that_hit_detector_but_not_sample, 1],
         detector_pixel_coords[rays_that_hit_detector_but_not_sample, 0],
     ] += 1
 
-
-    # # convert the index array into a set of indices into detector_image.flat
-    # flat_idx = np.ravel_multi_index(detector_pixel_coords[detector_rays_inside, :].T, detector_ray_image.shape)
-
-    # # get the set of unique indices and their corresponding counts
-    # uidx, ucounts = np.unique(flat_idx, return_counts=True)
-
-    # # assign the count value to each unique index in acc.flat
-    # detector_ray_image.flat[uidx] = ucounts
-    
     detector_sample_image[detector_pixel_coords[rays_that_hit_sample_and_detector, 1], detector_pixel_coords[rays_that_hit_sample_and_detector, 0]] = (sample_pixel_intensities*255).astype(np.int8)
     detector_sample_image[detector_pixel_coords[rays_that_hit_detector_but_not_sample, 1], detector_pixel_coords[rays_that_hit_detector_but_not_sample, 0]] = 255
-    
     
     return detector_ray_image, detector_sample_image, detector_pixel_coords
 

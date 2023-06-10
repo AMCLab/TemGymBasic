@@ -629,7 +629,8 @@ class DoubleDeflector():
     '''Creates a double deflector component and handles calls to GUI creation, updates to GUI
         and stores the component matrix. Primarily used in the Beam Tilt/Shift alignment.
     '''    
-    def __init__(self, z_up, z_low, name = '', updefx = 0.0, updefy = 0.0, lowdefx = 0.0, lowdefy = 0.0, label_radius = 0.3, radius = 0.25, num_points = 50):
+    def __init__(self, z_up, z_low, name = '', updefx = 0.0, updefy = 0.0, lowdefx = 0.0, lowdefy = 0.0, 
+                 scan_rotation = 0, label_radius = 0.3, radius = 0.25, num_points = 50):
         '''
 
         Parameters
@@ -679,6 +680,8 @@ class DoubleDeflector():
         self.lowdefx = lowdefx
         self.lowdefy = lowdefy
         
+        self.scan_rotation = scan_rotation
+        
         self.defratiox = -1.
         self.defratioy = -1.
         
@@ -715,11 +718,34 @@ class DoubleDeflector():
 
         return matrix
     
+    def rotation_matrix(self, scan_rotation):
+        '''Scan rotation ray transfer matrix
+
+        Parameters
+        ----------
+        scan_rotation : float
+            scan_rotation in degrees
+
+        Returns
+        -------
+        ndarray
+            Output ray transfer matrix
+        '''        
+        rad = (scan_rotation/180)*np.pi
+        matrix = np.array([[np.cos(rad), 0, -np.sin(rad), 0, 0],
+                           [0, 0, 0, 0, 0],
+                           [np.sin(rad), 0, np.cos(rad), 0, 0],
+                           [0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0]])
+
+        return matrix
+        
+    
     def set_matrices(self):
         '''
         '''        
         self.up_matrix = self.deflector_matrix(self.updefx, self.updefy)
-        self.low_matrix = self.deflector_matrix(self.lowdefx, self.lowdefy)
+        self.low_matrix = np.matmul(self.deflector_matrix(self.lowdefx, self.lowdefy), self.rotation_matrix(self.scan_rotation))
     
     def set_gl_geom(self):
         '''

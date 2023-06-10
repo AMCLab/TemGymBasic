@@ -24,7 +24,7 @@ import time
 import os
 
 
-mpl.rcParams['font.family'] = 'Helvetica'
+# mpl.rcParams['font.family'] = 'Helvetica'
 mpl.rc('axes', titlesize=32, labelsize=28)
 pg.setConfigOption('imageAxisOrder', 'row-major')
 
@@ -228,6 +228,8 @@ class LinearTEMCtrl:
         '''
         self.timer.start()
         self.scan_started = not self.scan_started
+        self.model.scan_pixel_x = 0
+        self.model.scan_pixel_y = 0
     
     def wobbletimerstart(self, btn, component):
         '''Start a timer that will update the beam wobblers which is used to set the deflector ratio
@@ -331,8 +333,12 @@ class LinearTEMCtrl:
             self.model.update_parameters_from_gui()
             
             if self.timer.isActive() and self.model.experiment == '4DSTEM' and self.scan_started == True:
-                self.update_scan_coil_ratio()
-                self.update_scan_position()
+                self.model.update_scan_position()
+                self.model.update_scan_coil_ratio()
+                
+                if self.model.scan_pixel_y == self.model.scan_pixels & self.model.scan_pixel_x == self.model.scan_pixels:
+                    self.timer.stop()
+                    self.scan_started = False
             else:
                 #update components
                 for component in self.model.components:
@@ -353,53 +359,6 @@ class LinearTEMCtrl:
             #Update the spot image and the rays of the viewerer 
             self.viewer.spot_img.setImage(detector_sample_image)
             self.viewer.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
-            
-    def update_scan_coil_ratio(self):
-        
-        sample_size = self.model.components[self.model.sample_idx].sample_size
-    
-        scan_position_x = sample_size/(2*self.model.scan_pixels)+(self.model.scan_pixel_x/self.model.scan_pixels)*sample_size - sample_size/2
-        scan_position_y = sample_size/(2*self.model.scan_pixels)+(self.model.scan_pixel_y/self.model.scan_pixels)*sample_size - sample_size/2
-    
-        #Distance to front focal plane from bottom deflector
-        dist_to_ffp = abs(self.model.scan_coils.z_low-(self.model.obj_lens.z+abs(self.model.obj_lens.f)))
-        dist_to_lens = abs(self.model.scan_coils.z_low-self.model.obj_lens.z)
-        
-        self.model.scan_coils.defratiox = -1-1*self.model.scan_coils.dist/dist_to_ffp
-        self.model.scan_coils.defratioy = -1-1*self.model.scan_coils.dist/dist_to_ffp
-        
-        #upper_deflection = x_specimen/(scan_coil_distance + distance_to_lens*deflector_ratio+distance_to_lens)
-        self.model.scan_coils.updefx = scan_position_x/(self.model.scan_coils.dist+dist_to_lens*self.model.scan_coils.defratiox+dist_to_lens)
-        self.model.scan_coils.lowdefx = self.model.scan_coils.defratiox*self.model.scan_coils.updefx
-        
-        self.model.scan_coils.updefy = scan_position_y/(self.model.scan_coils.dist+dist_to_lens*self.model.scan_coils.defratiox+dist_to_lens)
-        self.model.scan_coils.lowdefy = self.model.scan_coils.defratioy*self.model.scan_coils.updefy
-        
-        self.model.scan_coils.set_matrices()
-        
-        self.model.descan_coils.defratiox = (-1-1*self.model.scan_coils.dist/dist_to_ffp)
-        self.model.descan_coils.defratioy = (-1-1*self.model.scan_coils.dist/dist_to_ffp)
-        
-        #upper_deflection = x_specimen/(scan_coil_distance + distance_to_lens*deflector_ratio+distance_to_lens)
-        self.model.descan_coils.updefx = -self.model.scan_coils.updefx*(self.model.scan_coils.dist+self.model.scan_coils.defratiox*dist_to_lens+dist_to_lens)/self.model.descan_coils.dist
-        self.model.descan_coils.lowdefx = -self.model.descan_coils.updefx
-        
-        self.model.descan_coils.updefy = -self.model.scan_coils.updefy*(self.model.scan_coils.dist+self.model.scan_coils.defratiox*dist_to_lens+dist_to_lens)/self.model.descan_coils.dist
-        self.model.descan_coils.lowdefy = -self.model.descan_coils.updefy
-        
-        self.model.descan_coils.set_matrices()
-            
-    def update_scan_position(self):
-        
-        self.model.scan_pixel_x +=1
-
-        if self.model.scan_pixel_x == self.model.scan_pixels:
-            self.model.scan_pixel_x = 0
-            self.model.scan_pixel_y +=1
-            if self.model.scan_pixel_y == self.model.scan_pixels:
-                self.timer.stop()
-                self.model.scan_pixel_y = 0
-                self.scan_started = False
     
 class Ui_splashui(object):
     def setupUi(self, splashui):
