@@ -13,7 +13,7 @@ class Model():
     '''
     def __init__(self, components, beam_z=1, num_rays=16, beam_type='point', 
                  gun_beam_semi_angle=0, beam_tilt_x=0, beam_tilt_y=0, beam_radius = 0.125,
-                 detector_size = 0.5, detector_pixels = 128, experiment = None, experiment_params = {}):
+                 detector_size = 0.5, detector_pixels = 128, experiment = None):
         '''
         Parameters
         ----------
@@ -46,6 +46,13 @@ class Model():
         detector_pixels : int, optional
             Set the number of pixels in the detector. A large number of pixels will 
             probably considerably hinder performance, by default 128
+        experiment : str or None, optional
+            Choose a specific experiment type:
+                - None leaves the default behaviour of TEMGYMBasic and does not enforce a certain order of components
+                in the model.
+                - '4DSTEM' sets up the conditions for a basic 4DSTEM experiment with an overfocused beam
+                projecting an image of the sample at each scan position.
+        
         '''        
         self.components = components
         self.num_rays = num_rays
@@ -73,11 +80,17 @@ class Model():
                        descan coils.')
 
             if self.components[0].type == 'Double Deflector':
-                
+
                 self.scan_coils = self.components[0]
                 self.obj_lens = self.components[1]
                 self.sample = self.components[2]
                 self.descan_coils = self.components[3]
+                
+                self.overfocus = 0.1
+                self.semiconv = 0.01
+                self.set_beam_radius_from_semiconv(self.semiconv)
+                self.set_obj_lens_f_from_overfocus(self.overfocus)
+                
                 self.scan_pixel_x = 0
                 self.scan_pixel_y = 0
                 self.scan_pixels = 128
@@ -182,7 +195,8 @@ class Model():
     
     #Add the matrices of each component to a list
     def update_component_matrix(self):
-        '''Update the matrix of each component 
+        '''Update the list of all component matrices, each matrix of which has 
+        been set by the component upon it's creation.
         '''        
         self.components_matrix = []
         for idx, component in enumerate(self.components):
@@ -197,7 +211,7 @@ class Model():
         '''Perform the neccessary matrix multiplications and function multiplications
         to propagate the beam through the column
         '''        
-        #Do the matrix multiplication of the first rays with the distance between the beam z 
+        #Do the matrix multiplication of the first rays with the distance between the initial beam z 
         #and the first component
         self.r[1, :, :] = np.matmul(self.propagate(self.z_distances[0]), self.r[0, :, :])
         
@@ -250,6 +264,7 @@ class Model():
                 self.r[idx+1, :, :] = np.matmul(self.propagate(self.z_distances[idx]), self.r[idx, :, :])
                 idx += 1
             else:
+                #Every other function has a single matrix, so just need to do straightforward matrix multiplication
                 self.r[idx, :, :] = np.matmul(component.matrix, self.r[idx, :, :])
                 self.r[idx+1, :, :] = np.matmul(self.propagate(self.z_distances[idx]), self.r[idx, :, :])
                 idx += 1
@@ -257,7 +272,7 @@ class Model():
     def update_parameters_from_gui(self):
         '''Update the GUI
         '''        
-        #This code updates the GUI sliders
+        #This code updates the GUI sliders if it exists
         self.num_rays = 2**(self.gui.rayslider.value())
         self.gun_beam_semi_angle = self.gui.beamangleslider.value()*1e-2
         self.beam_radius = self.gui.beamwidthslider.value()*self.beam_radius_init
@@ -279,15 +294,17 @@ class Model():
             self.scan_pixels = 2**(self.experiment_gui.scanpixelsslider.value())
             self.scanpixelsize = self.sample.width/self.scan_pixels
             self.cameralength = self.sample.z
+            self.set_experiment_labels()
 
         self.set_model_labels()
-        self.set_experiment_labels()
+
+        
+        #After updating parameters, we need to regenerate rays. 
         self.generate_rays()
         
     def update_scan_coil_ratio(self):
         
         sample_size = self.components[self.sample_idx].sample_size
-    
         scan_position_x = sample_size/(2*self.scan_pixels)+(self.scan_pixel_x/self.scan_pixels)*sample_size - sample_size/2
         scan_position_y = sample_size/(2*self.scan_pixels)+(self.scan_pixel_y/self.scan_pixels)*sample_size - sample_size/2
     

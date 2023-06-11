@@ -733,10 +733,10 @@ class DoubleDeflector():
         '''        
         rad = (scan_rotation/180)*np.pi
         matrix = np.array([[np.cos(rad), 0, -np.sin(rad), 0, 0],
-                           [0, 0, 0, 0, 0],
+                           [0, 1, 0, 0, 0],
                            [np.sin(rad), 0, np.cos(rad), 0, 0],
-                           [0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0]])
+                           [0, 0, 0, 1, 0],
+                           [0, 0, 0, 0, 1]])
 
         return matrix
         
@@ -745,7 +745,7 @@ class DoubleDeflector():
         '''
         '''        
         self.up_matrix = self.deflector_matrix(self.updefx, self.updefy)
-        self.low_matrix = np.matmul(self.deflector_matrix(self.lowdefx, self.lowdefy), self.rotation_matrix(self.scan_rotation))
+        self.low_matrix = np.matmul(self.rotation_matrix(self.scan_rotation), self.deflector_matrix(self.lowdefx, self.lowdefy))#self.deflector_matrix(self.lowdefx, self.lowdefy)
     
     def set_gl_geom(self):
         '''

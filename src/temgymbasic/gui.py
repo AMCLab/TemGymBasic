@@ -604,8 +604,8 @@ class ModelGui():
 
         self.beamwidthslider = QSlider(QtCore.Qt.Orientation.Horizontal)
         self.beamwidthslider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.beamwidthslider.setMinimum(-10)
-        self.beamwidthslider.setMaximum(9)
+        self.beamwidthslider.setMinimum(-100)
+        self.beamwidthslider.setMaximum(99)
         self.beamwidthslider.setValue(1)
         self.beamwidthslider.setTickPosition(QSlider.TicksBelow)
 

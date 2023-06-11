@@ -1,6 +1,5 @@
 
 import numpy as np
-from scipy.interpolate import interp2d
 
 def make_test_sample(size = 256):
     #Code From Dieter Weber
@@ -248,7 +247,7 @@ def x_axial_point_beam(r, gun_beam_semi_angle):
     return r
 
 def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_size, detector_pixels, 
-                        sample_size, sample_pixels, sample_image = None, flip_y = True, flip_x = True):
+                        sample_size, sample_pixels, sample_image, flip_y = True):
     '''From an image of rays that hit the detector at the base of the TEM
 
     Parameters
@@ -271,7 +270,7 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
         Note that the sample is always square
     sample_pixels : int
         Pixel resolution of the the sample
-    sample_image : 
+    sample_image : ndarray 
         image intensities of the sample. Used to form an image on the detector
     Returns
     -------
@@ -279,17 +278,20 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
         Ray image of where rays have hit the detector
     detector_sample_image : ndarray
         Sample image obtained by transferring ray which have hit the detector
+    sample_pixel_coords : ndarray
+        Coordinates of where each ray has hit the sample
     detector_pixel_coords : ndarray
-        Coordinates of where reach ray has hit the detector
+        Coordinates of where each ray has hit the detector
     '''    
     detector_ray_image = np.zeros((detector_pixels, detector_pixels), dtype=np.uint8)
-    detector_sample_image = np.zeros((detector_pixels, detector_pixels), dtype=np.uint8)
+    detector_sample_image = np.zeros((detector_pixels, detector_pixels))
       
     
     if flip_y == True:
         sample_rays_y = sample_rays_y*-1
         rays_y = rays_y*-1
-        
+    
+    #Convert rays from sample positions to pixel positions
     sample_pixel_coords_x = (
         np.round(sample_rays_x / (sample_size) * sample_pixels) + sample_pixels//2-1
     ).astype(np.int32)
@@ -300,7 +302,7 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
     
     sample_pixel_coords = np.vstack([sample_pixel_coords_x, sample_pixel_coords_y]).T
     
-    # set final image pixel coordinates
+    #Convert rays from detector positions to pixel positions
     detector_pixel_coords_x = (
         np.round(rays_x / (detector_size) * detector_pixels) + detector_pixels//2-1
     ).astype(np.int32)
@@ -310,7 +312,7 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
     ).astype(np.int32)
     
     detector_pixel_coords = np.vstack([detector_pixel_coords_x, detector_pixel_coords_y]).T
-
+    
     sample_rays_inside = np.all((sample_pixel_coords > 0) & (sample_pixel_coords < sample_pixels), axis=1).T
     
     detector_rays_inside = np.all((detector_pixel_coords > 0) & (detector_pixel_coords < detector_pixels), axis=1).T
@@ -320,15 +322,17 @@ def get_image_from_rays(rays_x, rays_y, sample_rays_x, sample_rays_y, detector_s
 
     sample_pixel_intensities = sample_image[sample_pixel_coords[rays_that_hit_sample_and_detector, 1], sample_pixel_coords[rays_that_hit_sample_and_detector, 0]]
     
+    #Return this image for the case when we want to just plot the beam on the detector
     detector_ray_image[
         detector_pixel_coords[rays_that_hit_detector_but_not_sample, 1],
         detector_pixel_coords[rays_that_hit_detector_but_not_sample, 0],
     ] += 1
-
-    detector_sample_image[detector_pixel_coords[rays_that_hit_sample_and_detector, 1], detector_pixel_coords[rays_that_hit_sample_and_detector, 0]] = (sample_pixel_intensities*255).astype(np.int8)
-    detector_sample_image[detector_pixel_coords[rays_that_hit_detector_but_not_sample, 1], detector_pixel_coords[rays_that_hit_detector_but_not_sample, 0]] = 255
     
-    return detector_ray_image, detector_sample_image, detector_pixel_coords
+    #Obtain sample image intensitions
+    detector_sample_image[detector_pixel_coords[rays_that_hit_sample_and_detector, 1], detector_pixel_coords[rays_that_hit_sample_and_detector, 0]] = sample_pixel_intensities
+    detector_sample_image[detector_pixel_coords[rays_that_hit_detector_but_not_sample, 1], detector_pixel_coords[rays_that_hit_detector_but_not_sample, 0]] = 0
+    
+    return detector_ray_image, detector_sample_image, sample_pixel_coords, detector_pixel_coords
 
 def convert_rays_to_line_vertices(model):
         '''Converts a ray position matrix of size [(steps, 5, num rays)] - 

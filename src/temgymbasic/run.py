@@ -121,7 +121,7 @@ class LinearTEMUi(QMainWindow):
         
         sp1 = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
         
-        self.tem_window.addItem(sp1)
+        # self.tem_window.addItem(sp1)
         
         self.tem_window.setBackgroundColor((150, 150, 150, 255))
         self.tem_window.setCameraPosition(distance=5)
@@ -177,7 +177,9 @@ class LinearTEMUi(QMainWindow):
         self.model.create_gui()
 
         self.gui_layout.addWidget(self.model.gui.box, 0)
-        self.gui_layout.addWidget(self.model.experiment_gui.box, 0)
+        
+        if self.model.experiment !=None:
+            self.gui_layout.addWidget(self.model.experiment_gui.box, 0)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(1)
@@ -262,7 +264,10 @@ class LinearTEMCtrl:
         '''Connect the updates of the model to the GUI
         '''        
         self.model.gui.rayslider.valueChanged.connect(self.update)
-        self.model.experiment_gui.scanpixelsslider.valueChanged.connect(self.update)
+        
+        if self.model.experiment != None:
+            self.model.experiment_gui.scanpixelsslider.valueChanged.connect(self.update)
+            
         self.model.gui.checkBoxParalell.stateChanged.connect(self.update)
         self.model.gui.checkBoxPoint.stateChanged.connect(self.update)
         self.model.gui.checkBoxAxial.stateChanged.connect(self.update)
@@ -335,6 +340,7 @@ class LinearTEMCtrl:
             if self.timer.isActive() and self.model.experiment == '4DSTEM' and self.scan_started == True:
                 self.model.update_scan_position()
                 self.model.update_scan_coil_ratio()
+                self.model.generate_rays()
                 
                 if self.model.scan_pixel_y == self.model.scan_pixels & self.model.scan_pixel_x == self.model.scan_pixels:
                     self.timer.stop()
@@ -346,18 +352,28 @@ class LinearTEMCtrl:
             
             self.model.step()
             lines_paired, allowed_rays = convert_rays_to_line_vertices(self.model)
-                            
-            #Create detector image of rays
-            detector_ray_image, detector_sample_image, _ = get_image_from_rays(
-                self.model.r[-1, 0, allowed_rays], self.model.r[-1, 2, allowed_rays], 
-                self.model.r[self.model.sample_r_idx, 0, allowed_rays], self.model.r[self.model.sample_r_idx, 2, allowed_rays], 
-                self.model.detector_size, self.model.detector_pixels,
-                self.model.components[self.model.sample_idx].sample_size, self.model.components[self.model.sample_idx].sample_pixels,
-                self.model.components[self.model.sample_idx].sample
-                )
             
+            if self.model.experiment_gui != None:
+                #Create detector image of rays
+                detector_ray_image, detector_sample_image, _, _ = get_image_from_rays(
+                    self.model.r[-1, 0, allowed_rays], self.model.r[-1, 2, allowed_rays], 
+                    self.model.r[self.model.sample_r_idx, 0, allowed_rays], self.model.r[self.model.sample_r_idx, 2, allowed_rays], 
+                    self.model.detector_size, self.model.detector_pixels,
+                    self.model.components[self.model.sample_idx].sample_size, self.model.components[self.model.sample_idx].sample_pixels,
+                    self.model.components[self.model.sample_idx].sample
+                    )
+            else:
+                #Create detector image of rays
+                detector_ray_image, detector_sample_image, _, _ = get_image_from_rays(
+                    self.model.r[-1, 0, allowed_rays], self.model.r[-1, 2, allowed_rays], 
+                    self.model.r[0, 0, allowed_rays], self.model.r[0, 2, allowed_rays], 
+                    self.model.detector_size, self.model.detector_pixels,
+                    self.model.components[self.model.sample_idx].sample_size, self.model.components[self.model.sample_idx].sample_pixels,
+                    self.model.components[self.model.sample_idx].sample
+                    )
+                
             #Update the spot image and the rays of the viewerer 
-            self.viewer.spot_img.setImage(detector_sample_image)
+            self.viewer.spot_img.setImage(detector_sample_image*255)
             self.viewer.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
     
 class Ui_splashui(object):

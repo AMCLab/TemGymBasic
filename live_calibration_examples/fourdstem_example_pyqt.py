@@ -14,7 +14,7 @@ def main():
     detector_pixel_size = 0.000050 #pixel size in metres
     detector_width = detector_pixels * detector_pixel_size
     
-    scan_pixels = 128
+    scan_pixels = 256
     scan_pixel_size = 0.000001 #for now assume square sample
     sample_width = scan_pixels * scan_pixel_size
     
