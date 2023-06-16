@@ -9,6 +9,7 @@ import pyqtgraph as pg
 font = QFont()
 font.setPixelSize(20)
 
+    
 class Lens():
     '''Creates a lens component and handles calls to GUI creation, updates to GUI
         and stores the component matrix.
@@ -39,6 +40,7 @@ class Lens():
         self.num_points = num_points
         
         self.f = f
+        self.f_temp = f
         self.ftime = 0
         self.blocked_ray_idcs = []
         
@@ -93,30 +95,41 @@ class Lens():
     def set_flabel(self):
         '''
         '''        
-        self.gui.flabel.setText(
-            'Focal Length = ' + "{:.2f}".format(self.f))
         self.gui.flabel_table.setText(
-            'Focal Length = ' + "{:.2f}".format(self.f))
+            'Focal Length = ' + "{:.2f}".format(float(self.f)))
         
     def create_gui(self):
         '''
         '''        
         self.gui = LensGui(self.name, self.f)
         
-    def update_parameters_from_gui(self):
-        '''
-        '''        
-        '''Update method called by the main loop of the programme
-        '''        
-        self.f = self.gui.fslider.value()*1e-3
-
-        if self.gui.fwobble.isChecked():
-            self.f += np.abs(np.sin(-1*2*np.pi*3e-2*self.ftime))*-0.6
-            self.ftime += 1
-
-        self.set_flabel()
-        self.set_matrix()
+        self.gui.flineedit.editingFinished.connect(self.updated_line_edit)
+        self.gui.fslider.valueChanged.connect(self.updated_slider)
         
+        # self.gui.flineedit.textChanged.connect(partial(self.update_parameters_from_gui, 'QLineEdit'))
+
+    def updated_slider(self, value):
+        self.f = self.f_temp + self.gui.fslider.value()*float(self.gui.flineeditstep.text())
+        self.gui.flineedit.setText(str(self.f))
+        
+    def updated_line_edit(self):
+        self.f = float(self.gui.flineedit.text())
+        self.f_temp = float(self.gui.flineedit.text())
+        self.gui.fslider.setValue(1)
+        
+    def update_parameters_from_gui(self):
+     
+        '''Update method called by the main loop of the programme
+        '''      
+        if self.gui.fwobble.isChecked():
+            f0 = float(self.gui.flineedit.text())
+            self.f = f0 + float(self.gui.fwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
+            self.ftime += 1
+            
+        if abs(self.f) > 1e-14:
+            self.set_flabel()
+            self.set_matrix()
+            
 
 class AstigmaticLens():
     '''Creates an Astigmatic lens component and handles calls to GUI creation, updates to GUI
@@ -151,7 +164,10 @@ class AstigmaticLens():
         self.num_points = num_points
         
         self.fx = fx
+        self.fx_temp = fx
         self.fy = fy
+        self.fy_temp = fy
+        self.ftime = 0
 
         self.blocked_ray_idcs = []
         
@@ -204,31 +220,205 @@ class AstigmaticLens():
         self.label = gl.GLTextItem(pos=np.array(
             [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
         self.label.setData(font = font)
-        
-    def set_flabel(self):
+    
+    def create_gui(self):
         '''
         '''        
-        self.gui.fxlabel.setText(
-            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
-        self.gui.fylabel.setText(
-            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
-        self.gui.fxlabel_table.setText(
-            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
-        self.gui.fylabel_table.setText(
-            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
+        self.gui = AstigmaticLensGui(self.name, self.gui_label, self.type, self.fx, self.fy)
         
-    def create_gui(self): 
-        '''
-        '''        
-        self.gui = AstigmaticLensGui(self.name, self.gui_label, self.fx, self.fy)
+        self.gui.fxlineedit.editingFinished.connect(self.updated_fxline_edit)
+        self.gui.fylineedit.editingFinished.connect(self.updated_fyline_edit)
+        self.gui.fxslider.valueChanged.connect(self.updated_fxslider)
+        self.gui.fyslider.valueChanged.connect(self.updated_fyslider)
+            
+    def updated_fxslider(self, value):
+        self.fx = self.fx_temp + self.gui.fxslider.value()*float(self.gui.fxlineeditstep.text())
+        self.gui.fxlineedit.setText(str(self.fx))
+        
+    def updated_fyslider(self, value):
+        self.fy = self.fy_temp + self.gui.fyslider.value()*float(self.gui.fylineeditstep.text())
+        self.gui.fylineedit.setText(str(self.fy))
+        
+    def updated_fxline_edit(self):
+        self.fx = float(self.gui.fxlineedit.text())
+        self.fx_temp = float(self.gui.fxlineedit.text())
+        self.gui.fxslider.setValue(1)
+        
+    def updated_fyline_edit(self):
+        self.fy = float(self.gui.fylineedit.text())
+        self.fy_temp = float(self.gui.fylineedit.text())
+        self.gui.fyslider.setValue(1)
         
     def update_parameters_from_gui(self):
+     
+        '''Update method called by the main loop of the programme
+        '''      
+        
+        if self.gui.fwobbleamplineedit.text() == '':
+            self.gui.fwobbleamplineedit.setText("0.")
+            
+        if self.gui.fwobbleamplineedit.text() == '':
+            self.gui.fwobbleamplineedit.setText("0.")
+            
+        if self.gui.fxlineeditstep.text() == '':
+            self.gui.fxlineeditstep.setText("0.")
+            
+        if self.gui.fylineeditstep.text() == '':
+            self.gui.fylineeditstep.setText("0.")
+            
+        if self.gui.fwobble.isChecked():
+            f0x = float(self.gui.fxlineedit.text())
+            f0y = float(self.gui.fylineedit.text())
+            
+            self.fx = f0x + float(self.gui.fwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
+            self.fy = f0y + float(self.gui.fwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
+            self.ftime += 1
+            
+        if abs(self.fx) > 1e-14 and abs(self.fy) > 1e-14:
+            self.set_matrix()
+            
+class Quadrupole():
+    '''Creates a quadrupole component and handles calls to GUI creation, updates to GUI
+        and stores the component matrix. Almost exactly the same as astigmatic lens component
+        '''
+    def __init__(self, z, name = '', fx = -0.5, fy = -0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
+        '''
+
+        Parameters
+        ----------
+        z : float
+            Position of component in optic axis
+        name : str, optional
+            Name of this component which will be displayed by GUI, by default ''
+        fx : float, optional, 
+            Focal length of this lens in x, by default -0.5
+        fx : float, optional, 
+            Focal length of this lens in y, by default -0.5
+        label_radius : float, optional
+            Location to place the label in the 3D GUI, by default 0.3
+        radius : float, optional
+            Radius of the 3D model of this component, by default 0.25
+        num_points : int, optional
+            Number of points to use to make the 3D model, by default 50
+        '''        
+
+        self.type = 'Quadrupole'
+        self.gui_label = 'Stigmator Strength'
+        self.z = z
+        self.radius = radius 
+        self.label_radius = label_radius
+        self.num_points = num_points
+        
+        self.fx = fx
+        self.fx_temp = fx
+        self.fy = fy
+        self.fy_temp = fy
+        self.ftime = 0
+
+        self.blocked_ray_idcs = []
+        
+        self.name = name
+        
+        self.set_gl_geom()
+        self.set_gl_label()
+        self.set_matrix()
+        
+    def lens_matrix(self, fx, fy):
+        '''Quadrupole lens ray transfer matrix
+
+        Parameters
+        ----------
+        fx : float
+            focal length in x
+        fy : float
+            focal length in y
+
+        Returns
+        -------
+        ndarray
+            Output Ray Transfer Matrix
+        '''        
+        
+        matrix = np.array([[1, 0,      0, 0, 0],
+                           [-1 / fx, 1,      0, 0, 0],
+                           [0, 0,      1, 0, 0],
+                           [0, 0, -1 / fy, 1, 0],
+                           [0, 0,       0, 0, 1]])
+
+        return matrix
+    
+    def set_matrix(self):
         '''
         '''        
-        self.fx = self.gui.fxslider.value()*1e-3
-        self.fy = self.gui.fyslider.value()*1e-3
-        self.set_flabel()
-        self.set_matrix()
+        self.matrix = self.lens_matrix(self.fx, self.fy)
+    
+    def set_gl_geom(self):
+        '''
+        '''        
+        self.gl_points = []
+        self.points = geom.quadrupole(self.radius, np.pi/6, self.z, self.num_points)
+
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[0].T, color="b", width=5))
+        
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[1].T, color="b", width=5))
+
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[2].T, color="r", width=5))
+        
+        self.gl_points.append(gl.GLLinePlotItem(
+            pos=self.points[3].T, color="r", width=5))
+    
+    
+    def set_gl_label(self):
+        '''
+        '''        
+        self.label = gl.GLTextItem(pos=np.array(
+            [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
+        self.label.setData(font = font)
+    
+    def create_gui(self):
+        '''
+        '''        
+        self.gui = AstigmaticLensGui(self.name, self.gui_label, self.type, self.fx, self.fy)
+        
+        self.gui.fxlineedit.editingFinished.connect(self.updated_fxline_edit)
+        self.gui.fylineedit.editingFinished.connect(self.updated_fyline_edit)
+        self.gui.fxslider.valueChanged.connect(self.updated_fxslider)
+        self.gui.fyslider.valueChanged.connect(self.updated_fyslider)
+            
+    def updated_fxslider(self, value):
+        self.fx = self.fx_temp + self.gui.fxslider.value()*float(self.gui.fxlineeditstep.text())
+        self.gui.fxlineedit.setText(str(self.fx))
+        
+    def updated_fyslider(self, value):
+        self.fy = self.fy_temp + self.gui.fyslider.value()*float(self.gui.fylineeditstep.text())
+        self.gui.fylineedit.setText(str(self.fy))
+        
+    def updated_fxline_edit(self):
+        self.fx = float(self.gui.fxlineedit.text())
+        self.fx_temp = float(self.gui.fxlineedit.text())
+        self.gui.fxslider.setValue(1)
+        
+    def updated_fyline_edit(self):
+        self.fy = float(self.gui.fylineedit.text())
+        self.fy_temp = float(self.gui.fylineedit.text())
+        self.gui.fyslider.setValue(1)
+        
+    def update_parameters_from_gui(self):
+     
+        '''Update method called by the main loop of the programme
+        '''      
+    
+        if self.gui.fxlineeditstep.text() == '':
+            self.gui.fxlineeditstep.setText("0.")
+            
+        if self.gui.fylineeditstep.text() == '':
+            self.gui.fylineeditstep.setText("0.")
+            
+        if abs(self.fx) > 1e-14 and abs(self.fy) > 1e-14:
+            self.set_matrix()
 
 class Sample():
     '''Creates a sample component which serves only as a visualisation on the 3D model. 
@@ -374,7 +564,7 @@ class Sample():
         
         self.gl_points[0].setMeshData(vertexes=self.verts, vertexColors=self.colors,
                                  smooth=True, drawEdges=False)
-        
+    
     def update_parameters_from_gui(self):
         '''
         '''        
@@ -387,127 +577,6 @@ class Sample():
         self.update_mesh()
         
         self.set_slabel()
-
-class Quadrupole():
-    '''Creates a quadrupole component and handles calls to GUI creation, updates to GUI
-        and stores the component matrix. Almost exactly the same as astigmatic lens component
-    '''    
-    def __init__(self, z, name = '', fx = -0.5, fy = -0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
-        '''
-
-        Parameters
-        ----------
-        z : float
-            Position of component in optic axis
-        name : str, optional
-            Name of this component which will be displayed by GUI, by default ''
-        fx : float, optional, 
-            Focal length of this quadrupole in x, by default -0.5
-        fx : float, optional, 
-            Focal length of this quadrupole in y, by default -0.5
-        label_radius : float, optional
-            Location to place the label in the 3D GUI, by default 0.3
-        radius : float, optional
-            Radius of the 3D model of this component, by default 0.25
-        num_points : int, optional
-            Number of points to use to make the 3D model, by default 50
-        '''        
-        self.type = 'Quadrupole'
-        self.gui_label = 'Stigmator Strength '
-        self.z = z
-        self.radius = radius 
-        self.label_radius = label_radius
-        self.num_points = num_points
-        
-        self.fx = fx
-        self.fy = fy
-
-        self.blocked_ray_idcs = []
-        
-        self.name = name
-        
-        self.set_gl_geom()
-        self.set_gl_label()
-        self.set_matrix()
-        
-    def lens_matrix(self, fx, fy):
-        '''Astigmatic lens ray transfer matrix
-
-        Parameters
-        ----------
-        fx : float
-            focal length in x
-        fy : float
-            focal length in y
-
-        Returns
-        -------
-        ndarray
-            Output Ray Transfer Matrix
-        '''        
-        
-        matrix = np.array([[1, 0,      0, 0, 0],
-                           [-1 / fx, 1,      0, 0, 0],
-                           [0, 0,      1, 0, 0],
-                           [0, 0, -1 / fy, 1, 0],
-                           [0, 0,       0, 0, 1]])
-
-        return matrix
-    
-    def set_matrix(self):
-        '''
-        '''        
-        self.matrix = self.lens_matrix(self.fx, self.fy)
-    
-    def set_gl_geom(self):
-        '''
-        '''        
-        self.gl_points = []
-        self.points = geom.quadrupole(self.radius, np.pi/6, self.z, self.num_points)
-
-        self.gl_points.append(gl.GLLinePlotItem(
-            pos=self.points[0].T, color="b", width=5))
-        
-        self.gl_points.append(gl.GLLinePlotItem(
-            pos=self.points[1].T, color="b", width=5))
-
-        self.gl_points.append(gl.GLLinePlotItem(
-            pos=self.points[2].T, color="r", width=5))
-        
-        self.gl_points.append(gl.GLLinePlotItem(
-            pos=self.points[3].T, color="r", width=5))
-    
-    def set_gl_label(self):
-        '''
-        '''
-        self.label = gl.GLTextItem(pos=np.array(
-            [-self.label_radius, self.label_radius, self.z]), text=self.name, color='w')
-        self.label.setData(font = font)
-        
-    def set_flabel(self):
-        '''
-        '''        
-        self.gui.fxlabel.setText(
-            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
-        self.gui.fylabel.setText(
-            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
-        self.gui.fxlabel_table.setText(
-            self.gui_label + 'X = ' + "{:.2f}".format(self.fx))
-        self.gui.fylabel_table.setText(
-            self.gui_label + 'Y = ' + "{:.2f}".format(self.fy))
-        
-    def create_gui(self):
-        '''
-        '''        
-        self.gui = AstigmaticLensGui(self.name, self.type, self.fx, self.fy)
-        
-    def update_parameters_from_gui(self):
-        '''
-        '''        
-        self.fx = self.gui.fxslider.value()*1e-3
-        self.fy = self.gui.fyslider.value()*1e-3
-        self.set_flabel()
-        self.set_matrix()
 
 class Deflector():
     '''Creates a single deflector component and handles calls to GUI creation, updates to GUI
@@ -542,6 +611,8 @@ class Deflector():
         
         self.defx = defx
         self.defy = defy
+        self.defx_temp = defx
+        self.defy_temp = defy
         
         self.blocked_ray_idcs = []
         
@@ -602,28 +673,60 @@ class Deflector():
     def set_deflabel(self):
         '''
         '''        
-        self.gui.defxlabel.setText(
-            'X Deflection = ' + "{:.2f}".format(self.defx))
-        self.gui.defylabel.setText(
-            'Y Deflection = ' + "{:.2f}".format(self.defy))
         self.gui.defxlabel_table.setText(
             'X Deflection = ' + "{:.2f}".format(self.defx))
         self.gui.defylabel_table.setText(
             'Y Deflection = ' + "{:.2f}".format(self.defy))
         
-        
+
     def create_gui(self):  
         '''
         '''        
         self.gui = DeflectorGui(self.name, self.defx, self.defy)
         
+        self.gui.defxlineedit.editingFinished.connect(self.updated_defxline_edit)
+        self.gui.defylineedit.editingFinished.connect(self.updated_defyline_edit)
+        self.gui.defxslider.valueChanged.connect(self.updated_defxslider)
+        self.gui.defyslider.valueChanged.connect(self.updated_defyslider)
+            
+    def updated_defxslider(self, value):
+        self.defx = self.defx_temp + self.gui.defxslider.value()*float(self.gui.defxlineeditstep.text())
+        self.gui.defxlineedit.setText(str(self.defx))
+        
+    def updated_defyslider(self, value):
+        self.defy = self.defy_temp + self.gui.defyslider.value()*float(self.gui.defylineeditstep.text())
+        self.gui.defylineedit.setText(str(self.defy))
+        
+    def updated_defxline_edit(self):
+        self.defx = float(self.gui.defxlineedit.text())
+        self.defx_temp = float(self.gui.defxlineedit.text())
+        self.gui.defxslider.setValue(1)
+        
+    def updated_defyline_edit(self):
+        self.defy = float(self.gui.defylineedit.text())
+        self.defy_temp = float(self.gui.defylineedit.text())
+        self.gui.defyslider.setValue(1)
+        
     def update_parameters_from_gui(self):
-        '''
-        '''        
-        self.defx = self.gui.defxslider.value()*1e-3
-        self.defy = self.gui.defyslider.value()*1e-3
-        self.set_deflabel()
+     
+        '''Update method called by the main loop of the programme
+        '''      
+    
+        if self.gui.defxlineeditstep.text() == '':
+            self.gui.defxlineeditstep.setText("0.")
+            
+        if self.gui.defylineeditstep.text() == '':
+            self.gui.defylineeditstep.setText("0.")
+            
         self.set_matrix()
+        
+    # def update_parameters_from_gui(self):
+    #     '''
+    #     '''        
+    #     self.defx = self.gui.defxslider.value()*1e-3
+    #     self.defy = self.gui.defyslider.value()*1e-3
+    #     self.set_deflabel()
+    #     self.set_matrix()
         
 class DoubleDeflector():
     '''Creates a double deflector component and handles calls to GUI creation, updates to GUI
@@ -679,6 +782,15 @@ class DoubleDeflector():
         
         self.lowdefx = lowdefx
         self.lowdefy = lowdefy
+        
+        self.updefx_temp = updefx
+        self.updefy_temp = updefy
+        
+        self.lowdefx_temp = lowdefx
+        self.lowdefy_temp = lowdefy
+        
+        self.defratiox_temp = -1.
+        self.defratioy_temp = -1.
         
         self.scan_rotation = scan_rotation
         
@@ -777,18 +889,7 @@ class DoubleDeflector():
     def set_deflabel(self): 
         '''
         '''        
-        self.gui.updefxlabel.setText(
-            'X Deflection = ' + "{:.2f}".format(self.updefx))
-        self.gui.updefylabel.setText(
-            'Y Deflection = ' + "{:.2f}".format(self.updefy))
-        self.gui.lowdefxlabel.setText(
-            'X Deflection = ' + "{:.2f}".format(self.lowdefx))
-        self.gui.lowdefylabel.setText(
-            'Y Deflection = ' + "{:.2f}".format(self.lowdefy))
-        self.gui.defratioxlabel.setText(
-            'Lower Deflector X Response Ratio = ' + "{:.2f}".format(self.defratiox))
-        self.gui.defratioylabel.setText(
-            'Lower Deflector Y Response Ratio = ' + "{:.2f}".format(self.defratioy))
+
         self.gui.updefxlabel_table.setText(
             'X Deflection = ' + "{:.2f}".format(self.updefx))
         self.gui.updefylabel_table.setText(
@@ -797,53 +898,132 @@ class DoubleDeflector():
             'X Deflection = ' + "{:.2f}".format(self.lowdefx))
         self.gui.lowdefylabel_table.setText(
             'Y Deflection = ' + "{:.2f}".format(self.lowdefy))
-        self.gui.defratioxlabel_table.setText(
+        self.gui.defxratiolabel_table.setText(
             'Lower Deflector X Response Ratio = ' + "{:.2f}".format(self.defratiox))
-        self.gui.defratioylabel_table.setText(
+        self.gui.defyratiolabel_table.setText(
             'Lower Deflector Y Response Ratio = ' + "{:.2f}".format(self.defratioy))
         
     def create_gui(self):
         '''
         '''        
         self.gui = DoubleDeflectorGui(self.name, self.updefx, self.updefy, self.lowdefx, self.lowdefy)
+        self.gui.updefxlineedit.editingFinished.connect(self.updated_updefxline_edit)
+        self.gui.updefylineedit.editingFinished.connect(self.updated_updefyline_edit)
+        self.gui.updefxslider.valueChanged.connect(self.updated_updefxslider)
+        self.gui.updefyslider.valueChanged.connect(self.updated_updefyslider)
+        
+        self.gui.updefxlineeditstep.editingFinished.connect(self.updated_updefxline_editstep)
+        self.gui.updefylineeditstep.editingFinished.connect(self.updated_updefyline_editstep)
+
+        self.gui.lowdefxlineedit.editingFinished.connect(self.updated_lowdefxline_edit)
+        self.gui.lowdefylineedit.editingFinished.connect(self.updated_lowdefyline_edit)
+        self.gui.lowdefxslider.valueChanged.connect(self.updated_lowdefxslider)
+        self.gui.lowdefyslider.valueChanged.connect(self.updated_lowdefyslider)
+        
+        self.gui.lowdefxlineeditstep.editingFinished.connect(self.updated_lowdefxline_editstep)
+        self.gui.lowdefylineeditstep.editingFinished.connect(self.updated_lowdefyline_editstep)
+        
+        self.gui.defxratiolineedit.editingFinished.connect(self.updated_defxratioline_edit)
+        self.gui.defyratiolineedit.editingFinished.connect(self.updated_defyratioline_edit)
+        self.gui.defxratioslider.valueChanged.connect(self.updated_defxratioslider)
+        self.gui.defyratioslider.valueChanged.connect(self.updated_defyratioslider)
+        
+        self.gui.defxratiolineeditstep.editingFinished.connect(self.updated_defxratioline_editstep)
+        self.gui.defyratiolineeditstep.editingFinished.connect(self.updated_defyratioline_editstep)
+            
+    def updated_updefxslider(self, value):
+        self.updefx = self.updefx_temp + self.gui.updefxslider.value()*float(self.gui.updefxlineeditstep.text())
+        self.gui.updefxlineedit.setText(str(self.updefx))
+        
+    def updated_updefyslider(self, value):
+        self.updefy = self.updefy_temp + self.gui.updefyslider.value()*float(self.gui.updefylineeditstep.text())
+        self.gui.updefylineedit.setText(str(self.updefy))
+        
+    def updated_updefxline_edit(self):
+        self.updefx = float(self.gui.updefxlineedit.text())
+        self.updefx_temp = float(self.gui.updefxlineedit.text())
+        self.gui.updefxslider.setValue(1)
+        
+    def updated_updefyline_edit(self):
+        self.updefy = float(self.gui.updefylineedit.text())
+        self.updefy_temp = float(self.gui.updefylineedit.text())
+        self.gui.updefyslider.setValue(1)
+        
+    def updated_updefxline_editstep(self, value):
+        self.gui.updefxslider.setValue(1)
+        
+    def updated_updefyline_editstep(self, value):
+        self.gui.updefyslider.setValue(1)
+        
+    def updated_lowdefxslider(self, value):
+        self.lowdefx = self.lowdefx_temp + self.gui.lowdefxslider.value()*float(self.gui.lowdefxlineeditstep.text())
+        self.gui.lowdefxlineedit.setText(str(self.lowdefx))
+        
+    def updated_lowdefyslider(self, value):
+        self.lowdefy = self.lowdefy_temp + self.gui.lowdefyslider.value()*float(self.gui.lowdefylineeditstep.text())
+        self.gui.lowdefylineedit.setText(str(self.lowdefy))
+        
+    def updated_lowdefxline_edit(selfe):
+        self.lowdefx = float(self.gui.lowdefxlineedit.text())
+        self.lowdefx_temp = float(self.gui.lowdefxlineedit.text())
+        self.gui.lowdefxslider.setValue(1)
+        
+    def updated_lowdefyline_edit(self):
+        self.lowdefy = float(self.gui.lowdefylineedit.text())
+        self.lowdefy_temp = float(self.gui.lowdefylineedit.text())
+        self.gui.lowdefyslider.setValue(1)
+        
+    def updated_lowdefxline_editstep(self, value):
+        self.gui.lowdefxslider.setValue(1)
+        
+    def updated_lowdefyline_editstep(self, value):
+        self.gui.lowdefyslider.setValue(1)
+        
+    def updated_defxratioslider(self, value):
+        self.defratiox = self.defratiox_temp + self.gui.defxratioslider.value()*float(self.gui.defxratiolineeditstep.text())
+        self.gui.defxratiolineedit.setText(str(self.defratiox))
+        
+    def updated_defyratioslider(self, value):
+        self.defratioy = self.defratioy_temp + self.gui.defyratioslider.value()*float(self.gui.defyratiolineeditstep.text())
+        self.gui.defyratiolineedit.setText(str(self.defratioy))
+        
+    def updated_defxratioline_edit(self):
+        self.defratiox = float(self.gui.defxratiolineedit.text())
+        self.defratiox_temp = float(self.gui.defxratiolineedit.text())
+        self.gui.defxratioslider.setValue(1)
+        
+    def updated_defyratioline_edit(self):
+        self.defratioy = float(self.gui.defyratiolineedit.text())
+        self.defratioy_temp = float(self.gui.defyratiolineedit.text())
+        self.gui.defyratioslider.setValue(1)
+        
+    def updated_defxratioline_editstep(self):
+        self.defratiox = float(self.gui.defxratiolineedit.text())
+        self.defratiox_temp = float(self.gui.defxratiolineedit.text())
+        self.gui.defxratioslider.setValue(1)
+        
+    def updated_defyratioline_editstep(self):
+        self.defratioy = float(self.gui.defyratiolineedit.text())
+        self.defratioy_temp = float(self.gui.defyratiolineedit.text())
+        self.gui.defyratioslider.setValue(1)
         
     def update_parameters_from_gui(self):
         '''
         '''        
-        self.updefx = self.gui.updefxslider.value()*1e-3
-        self.updefy = self.gui.updefyslider.value()*1e-3
-        self.lowdefx = self.gui.lowdefxslider.value()*1e-3
-        self.lowdefy = self.gui.lowdefyslider.value()*1e-3
-        self.defratiox = self.gui.defratioxslider.value()*1e-3
-        self.defratioy = self.gui.defratioyslider.value()*1e-3
         
         if self.gui.xbuttonwobble.isChecked():
-            self.updefx = (np.sin(-1*2*np.pi*1e-2*self.xtime))
+            self.updefx = float(self.gui.defxwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.defxwobblefreqlineedit.text())*self.xtime)
             self.lowdefx = self.updefx*self.defratiox
             self.xtime += 1
             
-        if self.gui.ybuttonwobble.isChecked():
-            self.updefy = (np.sin(-1*2*np.pi*1e-2*self.ytime))
+        if self.gui.xbuttonwobble.isChecked():
+            self.updefy = float(self.gui.defywobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.defywobblefreqlineedit.text())*self.ytime)
             self.lowdefy = self.updefy*self.defratioy
             self.ytime += 1
         
         if self.gui.usedefratio.isChecked():
-            self.updefx = self.gui.updefxslider.value()*1e-3
-            self.updefy = self.gui.updefyslider.value()*1e-3
             self.lowdefx = self.updefx*self.defratiox
             self.lowdefy = self.updefy*self.defratioy
-        
-        self.set_deflabel()
-        self.set_matrices()
-        
-    def update_gui_from_parameters(self):
-
-        self.gui.updefxslider.setValue(self.updefx)
-        self.gui.updefyslider.setValue(self.updefy )
-        self.gui.lowdefxslider.setValue(self.lowdefx)
-        self.gui.lowdefyslider.setValue(self.lowdefy)
-        self.gui.defratiox.setValue(self.defratiox)
-        self.gui.udefratioy.setValue(self.defratioy)
         
         self.set_deflabel()
         self.set_matrices()

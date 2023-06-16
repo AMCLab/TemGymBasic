@@ -9,8 +9,8 @@ def main():
     components = [comp.AstigmaticLens(name='Astigmatic Lens', z=1.2),
                 comp.Lens(name='Lens', z=1.0),
                 comp.Quadrupole(name='Quadrupole', z=0.9),
-                comp.DoubleDeflector(name='Double Deflector', z_up=0.70, z_low=0.65),
                 comp.Deflector(name='Deflector', z=0.6, defx=0, defy=0),
+                comp.DoubleDeflector(name='Double Deflector', z_up=0.50, z_low=0.45),
                 comp.Biprism(name='Biprism', z=0.4),
                 comp.Aperture(name='Aperture', z=0.1, aperture_radius_inner=0.05)]
 

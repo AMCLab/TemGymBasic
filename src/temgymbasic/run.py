@@ -219,8 +219,8 @@ class LinearTEMCtrl:
         #Create a timer for 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.setInterval(0)
-        
+        self.timer.setInterval(10)
+        # self.timer.start()
         # Connect signals and slots
         self.connectSignals()
         self.update()
@@ -257,6 +257,8 @@ class LinearTEMCtrl:
                     self.timer.start()
                     # making other check box to uncheck
                     component.gui.xbuttonwobble.setChecked(False)
+            else:
+                self.timer.start()
         else:
             self.timer.stop()
 
@@ -285,19 +287,33 @@ class LinearTEMCtrl:
         for component in self.model.components:
             if component.type == 'Lens':
                 component.gui.fslider.valueChanged.connect(self.update)
+                component.gui.flineedit.editingFinished.connect(self.update)
                 component.gui.fwobble.toggled.connect(partial(self.wobbletimerstart, component.gui.fwobble, component))
             elif component.type == 'Deflector':
                 component.gui.defxslider.valueChanged.connect(self.update)
                 component.gui.defyslider.valueChanged.connect(self.update)
             elif component.type == 'Double Deflector':
                 component.gui.updefxslider.valueChanged.connect(self.update)
+                component.gui.updefxlineedit.editingFinished.connect(self.update)
+                
                 component.gui.updefyslider.valueChanged.connect(self.update)
+                component.gui.updefylineedit.editingFinished.connect(self.update)
+                
                 component.gui.lowdefxslider.valueChanged.connect(self.update)
+                component.gui.lowdefxlineedit.editingFinished.connect(self.update)
+                
                 component.gui.lowdefyslider.valueChanged.connect(self.update)
-                component.gui.defratioxslider.valueChanged.connect(self.update)
-                component.gui.defratioyslider.valueChanged.connect(self.update)
+                component.gui.lowdefylineedit.editingFinished.connect(self.update)
+                
+                component.gui.defxratioslider.valueChanged.connect(self.update)
+                component.gui.defxratiolineedit.editingFinished.connect(self.update)
+                
+                component.gui.defyratioslider.valueChanged.connect(self.update)
+                component.gui.defyratiolineedit.editingFinished.connect(self.update)
+                
                 component.gui.xbuttonwobble.toggled.connect(partial(self.wobbletimerstart, component.gui.xbuttonwobble, component))
                 component.gui.ybuttonwobble.toggled.connect(partial(self.wobbletimerstart, component.gui.ybuttonwobble, component))
+                
             elif component.type == 'Biprism':
                 component.gui.defslider.valueChanged.connect(self.update)
                 component.gui.rotslider.valueChanged.connect(self.update)
@@ -308,6 +324,9 @@ class LinearTEMCtrl:
             elif component.type == 'Astigmatic Lens':
                 component.gui.fxslider.valueChanged.connect(self.update)
                 component.gui.fyslider.valueChanged.connect(self.update)
+                component.gui.fxlineedit.editingFinished.connect(self.update)
+                component.gui.fylineedit.editingFinished.connect(self.update)
+                component.gui.fwobble.toggled.connect(partial(self.wobbletimerstart, component.gui.fwobble, component))
             elif component.type == 'Quadrupole':
                 component.gui.fxslider.valueChanged.connect(self.update)
                 component.gui.fyslider.valueChanged.connect(self.update)
@@ -353,7 +372,7 @@ class LinearTEMCtrl:
             self.model.step()
             lines_paired, allowed_rays = convert_rays_to_line_vertices(self.model)
             
-            if self.model.experiment_gui != None:
+            if self.model.experiment == '4DSTEM':
                 #Create detector image of rays
                 detector_ray_image, detector_sample_image, _, _ = get_image_from_rays(
                     self.model.r[-1, 0, allowed_rays], self.model.r[-1, 2, allowed_rays], 
@@ -362,18 +381,22 @@ class LinearTEMCtrl:
                     self.model.components[self.model.sample_idx].sample_size, self.model.components[self.model.sample_idx].sample_pixels,
                     self.model.components[self.model.sample_idx].sample
                     )
+                
+                self.viewer.spot_img.setImage(detector_sample_image*255)
             else:
                 #Create detector image of rays
                 detector_ray_image, detector_sample_image, _, _ = get_image_from_rays(
                     self.model.r[-1, 0, allowed_rays], self.model.r[-1, 2, allowed_rays], 
                     self.model.r[0, 0, allowed_rays], self.model.r[0, 2, allowed_rays], 
                     self.model.detector_size, self.model.detector_pixels,
-                    self.model.components[self.model.sample_idx].sample_size, self.model.components[self.model.sample_idx].sample_pixels,
-                    self.model.components[self.model.sample_idx].sample
+                    1, 1,
+                    np.zeros((10, 10))
                     )
                 
+                self.viewer.spot_img.setImage(detector_ray_image)
+                
             #Update the spot image and the rays of the viewerer 
-            self.viewer.spot_img.setImage(detector_sample_image*255)
+            
             self.viewer.ray_geometry.setData(pos=lines_paired, color=(0, 0.8, 0, 0.05))
     
 class Ui_splashui(object):
