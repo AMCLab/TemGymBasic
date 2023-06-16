@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "temgymbasic"
-version = "0.5.9.4"
+version = "0.6.0.0"
 authors = [
   { name="David Landers", email="davidlanders2009@hotmail.com" },
 ]
