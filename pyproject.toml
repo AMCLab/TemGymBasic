@@ -17,12 +17,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-  'pyqtgraph==0.13.1',
-  'pyopengl==3.1.6',
-  'numpy==1.23.3',
+  'pyqtgraph',
+  'pyopengl',
+  'numpy',
   'triangle',
-  'PyQt5==5.15.2',
-  'matplotlib==3.6.1'
+  'PyQt5',
+  'matplotlib'
 ]
 
 [project.urls]
