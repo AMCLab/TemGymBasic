@@ -2,12 +2,17 @@ from temgymbasic import components as comp
 from temgymbasic.model import Model
 from temgymbasic.run import run_pyqt
 from PyQt5.QtWidgets import QApplication
+from temgymbasic.functions import make_test_sample
 import sys 
 
+
 def main():
+
+    sample = make_test_sample()
+
     #Create List of Components
     components = [comp.DoubleDeflector(name = 'Double Deflector', z_up = 0.4, z_low = 0.3),
-                  comp.Sample(name = 'Sample', z = 0.2),
+                  comp.Sample(name = 'Sample', sample = sample, z = 0.2),
                   comp.Lens(name = 'Objective Lens', z = 0.1, f = -0.1)]
     
     #Generate Model

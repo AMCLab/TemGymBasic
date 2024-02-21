@@ -78,7 +78,7 @@ def circular_beam(r, outer_radius):
 
     # Calculate the number of points per ring with the integer amoung of rings
     num_points_kth_ring = np.round(
-        2*np.pi*(np.arange(0, num_circles_int+1))).astype(int)
+        2*np.pi*(np.arange(0, num_circles_int+1))).astype(np.int32)s
 
     # get the remainding amount of rays
     remainder_rays = num_rays - np.sum(num_points_kth_ring)
@@ -160,7 +160,7 @@ def point_beam(r, gun_beam_semi_angle):
 
     # Calculate the number of points per ring with the integer amoung of rings
     num_points_kth_ring = np.round(
-        2*np.pi*(np.arange(0, num_circles_int+1))).astype(int)
+        2*np.pi*(np.arange(0, num_circles_int+1))).astype(np.int32)
 
     # get the remainding amount of rays
     remainder_rays = num_rays - np.sum(num_points_kth_ring)
@@ -169,7 +169,7 @@ def point_beam(r, gun_beam_semi_angle):
     proportion = num_points_kth_ring/np.sum(num_points_kth_ring)
 
     # resolve this proportion to an integer value, and reverse it
-    num_rays_to_each_ring = np.ceil(proportion*remainder_rays)[::-1]
+    num_rays_to_each_ring = np.ceil(proportion*remainder_rays)[::-1].astype(np.int32)
 
     # We need to decide on where to stop adding the remainder of rays to the
     # rest of the rings. We find this point by summing the rays in each ring

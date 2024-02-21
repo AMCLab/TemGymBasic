@@ -220,7 +220,7 @@ class LinearTEMCtrl:
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
         self.timer.setInterval(10)
-        # self.timer.start()
+        self.timer.start()
         # Connect signals and slots
         self.connectSignals()
         self.update()
