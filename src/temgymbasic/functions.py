@@ -78,7 +78,7 @@ def circular_beam(r, outer_radius):
 
     # Calculate the number of points per ring with the integer amoung of rings
     num_points_kth_ring = np.round(
-        2*np.pi*(np.arange(0, num_circles_int+1))).astype(np.int32)s
+        2*np.pi*(np.arange(0, num_circles_int+1))).astype(np.int32)
 
     # get the remainding amount of rays
     remainder_rays = num_rays - np.sum(num_points_kth_ring)
