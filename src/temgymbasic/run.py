@@ -220,7 +220,7 @@ class LinearTEMCtrl:
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
         self.timer.setInterval(10)
-        self.timer.start()
+        
         # Connect signals and slots
         self.connectSignals()
         self.update()
@@ -259,8 +259,7 @@ class LinearTEMCtrl:
                     component.gui.xbuttonwobble.setChecked(False)
             else:
                 self.timer.start()
-        else:
-            self.timer.stop()
+
 
     def connectSignals(self):
         '''Connect the updates of the model to the GUI
@@ -364,11 +363,19 @@ class LinearTEMCtrl:
                 if self.model.scan_pixel_y == self.model.scan_pixels & self.model.scan_pixel_x == self.model.scan_pixels:
                     self.timer.stop()
                     self.scan_started = False
-            else:
+            elif self.model.experiment == '4DSTEM':
                 #update components
                 for component in self.model.components:
                     component.update_parameters_from_gui()
-            
+            elif self.timer.isActive():
+                self.model.generate_rays()
+                for component in self.model.components:
+                    component.update_parameters_from_gui()
+            else:
+                for component in self.model.components:
+                    component.update_parameters_from_gui()
+
+                    
             self.model.step()
             lines_paired, allowed_rays = convert_rays_to_line_vertices(self.model)
             

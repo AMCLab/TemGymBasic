@@ -298,7 +298,6 @@ class Model():
 
         self.set_model_labels()
 
-        
         #After updating parameters, we need to regenerate rays. 
         self.generate_rays()
         

@@ -123,7 +123,7 @@ class Lens():
         '''      
         if self.gui.fwobble.isChecked():
             f0 = float(self.gui.flineedit.text())
-            self.f = f0 + float(self.gui.fwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
+            self.f = f0 + float(self.gui.fwobbleamplineedit.text())*np.sin(0.01*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
             self.ftime += 1
             
         if abs(self.f) > 1e-14:
@@ -270,8 +270,8 @@ class AstigmaticLens():
             f0x = float(self.gui.fxlineedit.text())
             f0y = float(self.gui.fylineedit.text())
             
-            self.fx = f0x + float(self.gui.fwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
-            self.fy = f0y + float(self.gui.fwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
+            self.fx = f0x + float(self.gui.fwobbleamplineedit.text())*np.sin(0.01*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
+            self.fy = f0y + float(self.gui.fwobbleamplineedit.text())*np.sin(0.01*float(self.gui.fwobblefreqlineedit.text())*self.ftime)
             self.ftime += 1
             
         if abs(self.fx) > 1e-14 and abs(self.fy) > 1e-14:
@@ -1012,12 +1012,12 @@ class DoubleDeflector():
         '''        
         
         if self.gui.xbuttonwobble.isChecked():
-            self.updefx = float(self.gui.defxwobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.defxwobblefreqlineedit.text())*self.xtime)
+            self.updefx = float(self.gui.defxwobbleamplineedit.text())*np.sin(0.01*float(self.gui.defxwobblefreqlineedit.text())*self.xtime)
             self.lowdefx = self.updefx*self.defratiox
             self.xtime += 1
             
         if self.gui.xbuttonwobble.isChecked():
-            self.updefy = float(self.gui.defywobbleamplineedit.text())*np.sin(2*np.pi*float(self.gui.defywobblefreqlineedit.text())*self.ytime)
+            self.updefy = float(self.gui.defywobbleamplineedit.text())*np.sin(0.01*float(self.gui.defywobblefreqlineedit.text())*self.ytime)
             self.lowdefy = self.updefy*self.defratioy
             self.ytime += 1
         
