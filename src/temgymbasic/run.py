@@ -464,7 +464,7 @@ def run_pyqt(model):
     return viewer
     
 #Example code to make a matplotlib plot
-def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, label_fontsize = 20):
+def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, label_fontsize = 20, **kwargs):
     '''Code to show a matplotlib model
 
     Parameters
@@ -493,8 +493,12 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, la
     #Collect their x, y & z coordinates
     x, y, z = rays[:, 0, :], rays[:, 2, :], model.z_positions
 
-    #Create a figure
-    fig, ax = plt.subplots(figsize=(12, 20))
+    #Create a figure, if none supplied.
+    fig = kwargs.get( 'figure', None )
+    ax = kwargs.get( 'axis', None )
+
+    if (fig == None and ax == None):
+        fig, ax = plt.subplots(figsize=(12, 20))
 
     ax.tick_params(axis='both', which='major', labelsize=14)
     ax.tick_params(axis='both', which='minor', labelsize=12)
