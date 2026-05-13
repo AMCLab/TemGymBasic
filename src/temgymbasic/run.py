@@ -486,19 +486,27 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, la
         Matplotlib figure object
     ax : class
         Matplotlib axis object of the figure
-    '''    
+    '''
+    # kwargs
+    fig = kwargs.get('figure', None)
+    ax = kwargs.get('axis', None)
+    rcol = kwargs.get('rcol', 'dimgray')
+    fcol = kwargs.get('rcol', 'aquamarine')
+    fcolpair = kwargs.get('rcol', ['khaki', 'deepskyblue'])
+    
     #Step the rays through the model to get the ray positions throughout the column
     rays = model.step()
 
     #Collect their x, y & z coordinates
     x, y, z = rays[:, 0, :], rays[:, 2, :], model.z_positions
 
-    #Create a figure, if none supplied.
-    fig = kwargs.get( 'figure', None )
-    ax = kwargs.get( 'axis', None )
-
+    #Create a figure
     if (fig == None and ax == None):
         fig, ax = plt.subplots(figsize=(12, 20))
+    elif (fig == None and ax != None):
+        fig, _ = plt.subplots(figsize=(12, 20))
+    elif (fig != None and ax == None):
+        _, ax = plt.subplots(figsize=(12, 20))
 
     ax.tick_params(axis='both', which='major', labelsize=14)
     ax.tick_params(axis='both', which='minor', labelsize=12)
@@ -525,9 +533,9 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, la
     allowed_rays = range(model.num_rays)
     
     #Set colors of rays
-    ray_color = 'dimgray'
-    fill_color = 'aquamarine'
-    fill_color_pair = ['khaki', 'deepskyblue']
+    ray_color = rcol
+    fill_color = fcol
+    fill_color_pair = fcolpair
 
     fill_alpha = 1
     ray_alpha = 1
