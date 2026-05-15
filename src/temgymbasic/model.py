@@ -373,7 +373,8 @@ class Model():
         )
         
     def set_experiment_labels(self):
-        '''Set labels of the model inside the GUI
+        '''
+        Set labels of the model inside the GUI
         '''        
         self.experiment_gui.scanpixelslabel.setText(
             str(self.scan_pixels))
@@ -403,7 +404,8 @@ class Model():
     
     #Propagation matrix used by the model to propagate rays between components
     def propagate(self, z):
-        '''Propagation matrix
+        '''
+        Propagation matrix
 
         Parameters
         ----------
