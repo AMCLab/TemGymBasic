@@ -1,3 +1,5 @@
+# To make analtyical, need to define distance units?
+
 import temgymbasic.shapes as geom
 from temgymbasic.gui import *
 import pyqtgraph.opengl as gl
