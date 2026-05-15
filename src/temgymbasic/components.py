@@ -430,6 +430,8 @@ class Sample():
         ----------
         z : float
             Position of component in optic axis
+        sample : 2D or 3D array
+            Array representing sample.
         name : str, optional
             Name of this component which will be displayed by GUI, by default ''
         label_radius : float, optional
@@ -444,6 +446,14 @@ class Sample():
             Y position of sample model, by default 0.
         width : float, optional
             Width of the edges of the square sample, by default 0.25
+
+        Warnings:
+        ------
+        TypeError: data must be 2D or 3D
+            Caused by passing a 1D array to the sample kwarg.
+
+        AttributeError: 'NoneType' object has no attribute 'shape'
+            Caused by not passing an array to the sample kwarg.
         '''        
 
         self.type = 'Sample'
