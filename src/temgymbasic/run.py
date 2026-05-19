@@ -551,6 +551,7 @@ def show_matplotlib(model, name = 'model.svg', component_lw = 4, edge_lw = 1, la
     fill_alpha = 1
     ray_alpha = 1
 
+    # Width of rays in diagram.
     ray_lw = 0.25
 
     highlight_edges = True
