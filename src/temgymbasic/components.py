@@ -1,3 +1,5 @@
+# To make analtyical, need to define distance units?
+
 import temgymbasic.shapes as geom
 from temgymbasic.gui import *
 import pyqtgraph.opengl as gl
@@ -132,7 +134,8 @@ class Lens():
             
 
 class AstigmaticLens():
-    '''Creates an Astigmatic lens component and handles calls to GUI creation, updates to GUI
+    '''
+    Creates an Astigmatic lens component and handles calls to GUI creation, updates to GUI
         and stores the component matrix.
     '''    
     def __init__(self, z, name = '', fx = -0.5, fy = -0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
@@ -421,7 +424,8 @@ class Quadrupole():
             self.set_matrix()
 
 class Sample():
-    '''Creates a sample component which serves only as a visualisation on the 3D model. 
+    '''
+    Creates a sample component which serves only as a visualisation on the 3D model. 
     '''    
     def __init__(self, z = 0., sample = None, name = '', label_radius = 0.3, width = 0.25, num_points = 50, x = 0., y = 0.):
         '''
@@ -430,6 +434,8 @@ class Sample():
         ----------
         z : float
             Position of component in optic axis
+        sample : 2D or 3D array
+            Array representing sample.
         name : str, optional
             Name of this component which will be displayed by GUI, by default ''
         label_radius : float, optional
@@ -444,6 +450,14 @@ class Sample():
             Y position of sample model, by default 0.
         width : float, optional
             Width of the edges of the square sample, by default 0.25
+
+        Warnings:
+        ------
+        TypeError: data must be 2D or 3D
+            Caused by passing a 1D array to the sample kwarg.
+
+        AttributeError: 'NoneType' object has no attribute 'shape'
+            Caused by not passing an array to the sample kwarg.
         '''        
 
         self.type = 'Sample'
@@ -579,8 +593,9 @@ class Sample():
         self.set_slabel()
 
 class Deflector():
-    '''Creates a single deflector component and handles calls to GUI creation, updates to GUI
-        and stores the component matrix. See Double Deflector component for a more useful version
+    '''
+    Creates a single deflector component and handles calls to GUI creation, updates to GUI
+    and stores the component matrix. See Double Deflector component for a more useful version
     '''    
     def __init__(self, z, name = '', defx = 0.5, defy = 0.5, label_radius = 0.3, radius = 0.25, num_points = 50):
         '''_summary_
@@ -638,11 +653,11 @@ class Deflector():
             Output ray transfer matrix
         '''        
         
-        matrix = np.array([[1, 0, 0, 0,          0],
+        matrix = np.array([[1, 0, 0, 0, 0],
                            [0, 1, 0, 0, def_x],
-                           [0, 0, 1, 0,          0],
+                           [0, 0, 1, 0, 0],
                            [0, 0, 0, 1, def_y],
-                           [0, 0, 0, 0,         1]])
+                           [0, 0, 0, 0, 1]])
 
         return matrix
     

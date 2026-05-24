@@ -1,3 +1,6 @@
+'''
+Shapes of components for visualisations.
+'''
 
 import numpy as np
 import triangle as tr

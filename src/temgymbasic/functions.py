@@ -1,4 +1,3 @@
-
 import numpy as np
 
 
@@ -51,7 +50,7 @@ def make_test_sample(size=256):
 
 # FIXME resolve code duplication between circular_beam() and point_beam()
 def circular_beam(r, outer_radius):
-    '''Generates a circular paralell initial beam
+    '''Generates a circular parallel initial beam
 
     Parameters
     ----------

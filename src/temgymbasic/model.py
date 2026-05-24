@@ -1,10 +1,13 @@
+'''
+This class create the model composed of the specified components, 
+and handles all of the computation that transmits the rays through each component.
+'''
+
 
 import numpy as np
 from temgymbasic.functions import circular_beam, point_beam, axial_point_beam, x_axial_point_beam
 from temgymbasic.gui import ModelGui, ExperimentGui
 
-'''This class create the model composed of the specified components, and handles all of the computation
-that transmits the rays through each component.'''
 
 class Model():
     '''Generates a model electron microscope. This class generates performs the matrix 
@@ -28,7 +31,7 @@ class Model():
             Choose the type of beam:
                     -'point' beam creates a set of rays that start from a single point and 
                      spread out like a cone.
-                    -'paralell' beam creates a set of rays that start from the same position, but 
+                    -'parallel' beam creates a set of rays that start from the same position, but 
                     each have the same angle.
                     - 'axial' creates a beam which is only visible on the x and y axis.
                     - 'x_axial' creates a beam which is only visible on the x-axis. This is only used 
@@ -40,7 +43,7 @@ class Model():
         beam_tilt_y : int, optional
             Set the tilt of the beam in the y direction, by default 0
         beam_radius : float, optional
-            Set the width of the beam - only matters if "paralell" beam type is selected
+            Set the width of the beam - only matters if "parallel" beam type is selected
         detector_size : float, optional
             Set the size of the detector, by default 0.5
         detector_pixels : int, optional
@@ -159,7 +162,8 @@ class Model():
         
     #Create the ModelGUI if we are running pyqtgraph
     def create_gui(self):
-        '''Create the GUI
+        '''
+        Create the GUI
         '''        
         self.gui = ModelGui(self.num_rays, self.beam_type,
                             self.gun_beam_semi_angle, self.beam_tilt_x, self.beam_tilt_y, self.beam_radius)
@@ -169,10 +173,12 @@ class Model():
             self.scan_pixels = self.experiment_gui.scanpixelsslider.value()
 
     def generate_rays(self):
-        '''Generate electron rays
-        '''        
-        #Make our 3D matrix of rays. This matrix is of shape (steps, 5, num rays), where
-        #steps is defined by the number of components.
+        '''
+        Generate electron rays.
+            
+        Make our 3D matrix of rays. This matrix is of shape (steps, 5, num rays), where
+        steps is defined by the number of components.
+        '''    
         
         self.steps = len(self.z_positions)
         
@@ -181,7 +187,7 @@ class Model():
         
         self.r[:, 4, :] = np.ones(self.num_rays)
 
-        if self.beam_type == 'paralell':
+        if self.beam_type == 'parallel':
             self.r, self.spot_indices = circular_beam(self.r, self.beam_radius)
         elif self.beam_type == 'point':
             self.r, self.spot_indices = point_beam(self.r, self.gun_beam_semi_angle)
@@ -195,7 +201,8 @@ class Model():
     
     #Add the matrices of each component to a list
     def update_component_matrix(self):
-        '''Update the list of all component matrices, each matrix of which has 
+        '''
+        Update the list of all component matrices, each matrix of which has 
         been set by the component upon it's creation.
         '''        
         self.components_matrix = []
@@ -208,7 +215,8 @@ class Model():
     
     #Perform the matrix multiplication of the rays with each component in the model
     def update_rays_stepwise(self):
-        '''Perform the neccessary matrix multiplications and function multiplications
+        '''
+        Perform the neccessary matrix multiplications and function multiplications
         to propagate the beam through the column
         '''        
         #Do the matrix multiplication of the first rays with the distance between the initial beam z 
@@ -270,7 +278,8 @@ class Model():
                 idx += 1
 
     def update_parameters_from_gui(self):
-        '''Update the GUI
+        '''
+        Update the GUI
         '''        
         #This code updates the GUI sliders if it exists
         self.num_rays = 2**(self.gui.rayslider.value())
@@ -285,8 +294,8 @@ class Model():
 
         if self.gui.checkBoxAxial.isChecked():
             self.beam_type = 'axial'
-        if self.gui.checkBoxParalell.isChecked():
-            self.beam_type = 'paralell'
+        if self.gui.checkBoxparallel.isChecked():
+            self.beam_type = ''
         if self.gui.checkBoxPoint.isChecked():
             self.beam_type = 'point'
             
@@ -346,7 +355,8 @@ class Model():
                 self.scan_pixel_y = 0
 
     def set_model_labels(self):
-        '''Set labels of the model inside the GUI
+        '''
+        Set labels of the model inside the GUI
         '''        
         self.gui.raylabel.setText(
             str(self.num_rays))
@@ -363,7 +373,8 @@ class Model():
         )
         
     def set_experiment_labels(self):
-        '''Set labels of the model inside the GUI
+        '''
+        Set labels of the model inside the GUI
         '''        
         self.experiment_gui.scanpixelslabel.setText(
             str(self.scan_pixels))
@@ -393,7 +404,8 @@ class Model():
     
     #Propagation matrix used by the model to propagate rays between components
     def propagate(self, z):
-        '''Propagation matrix
+        '''
+        Propagation matrix
 
         Parameters
         ----------

@@ -652,7 +652,7 @@ class ModelGui():
         num_rays : int
             Number of rays in the model
         beam_type : str
-            Type of initial beam: Axial, paralell of point. 
+            Type of initial beam: Axial, parallel of point. 
         gun_beam_semi_angle : float
             Semi angle of the beam 
         beam_tilt_x : float
@@ -696,7 +696,7 @@ class ModelGui():
 
         self.beamanglelabel = QLabel(str(round(gun_beam_semi_angle, 2)))
         self.beamanglelabel.setMinimumWidth(80)
-        self.modelbeamanglelabel = QLabel('Axial/Paralell Beam Semi Angle')
+        self.modelbeamanglelabel = QLabel('Axial/parallel Beam Semi Angle')
 
         hbox = QHBoxLayout()
         hbox.addWidget(self.beamangleslider)
@@ -717,7 +717,7 @@ class ModelGui():
 
         self.beamwidthlabel = QLabel('0')
         self.beamwidthlabel.setMinimumWidth(80)
-        self.modelbeamwidthlabel = QLabel('Paralell Beam Width')
+        self.modelbeamwidthlabel = QLabel('parallel Beam Width')
 
         hbox = QHBoxLayout()
         hbox.addWidget(self.beamwidthslider)
@@ -733,10 +733,10 @@ class ModelGui():
 
         self.checkBoxPoint = QCheckBox("Point Beam")
 
-        self.checkBoxParalell = QCheckBox("Paralell Beam")
+        self.checkBoxParallel = QCheckBox("parallel Beam")
 
-        self.checkBoxParalell.stateChanged.connect(
-            partial(self.uncheck, self.checkBoxParalell))
+        self.checkBoxParallel.stateChanged.connect(
+            partial(self.uncheck, self.checkBoxParallel))
         self.checkBoxPoint.stateChanged.connect(
             partial(self.uncheck, self.checkBoxPoint))
         self.checkBoxAxial.stateChanged.connect(
@@ -744,12 +744,12 @@ class ModelGui():
 
         hbox.addWidget(self.checkBoxAxial)
         hbox.addWidget(self.checkBoxPoint)
-        hbox.addWidget(self.checkBoxParalell)
+        hbox.addWidget(self.checkBoxParallel)
 
         if beam_type == 'axial':
             self.checkBoxAxial.setChecked(True)
-        elif beam_type == 'paralell':
-            self.checkBoxParalell.setChecked(True)
+        elif beam_type == 'parallel':
+            self.checkBoxParallel.setChecked(True)
         elif beam_type == 'point':
             self.checkBoxPoint.setChecked(True)
 
@@ -818,11 +818,11 @@ class ModelGui():
             if btn == self.checkBoxAxial:
 
                 # making other check box to uncheck
-                self.checkBoxParalell.setChecked(False)
+                self.checkBoxParallel.setChecked(False)
                 self.checkBoxPoint.setChecked(False)
 
             # if second check box is selected
-            elif btn == self.checkBoxParalell:
+            elif btn == self.checkBoxParallel:
 
                 # making other check box to uncheck
                 self.checkBoxAxial.setChecked(False)
@@ -833,7 +833,7 @@ class ModelGui():
 
                 # making other check box to uncheck
                 self.checkBoxAxial.setChecked(False)
-                self.checkBoxParalell.setChecked(False)
+                self.checkBoxParallel.setChecked(False)
 
 
 class ApertureGui():
